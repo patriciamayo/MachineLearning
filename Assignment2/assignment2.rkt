@@ -51,7 +51,7 @@
       	   (obtener-al-azar0 (listaCorrecta lista))))
 
 ; Ejercicio 7
-(define direccionEjemplos1 "/Users/patriciamayotejedor/Documents/Private Development/UNED/Machine Learning/tema1/ejemplos.scm")
+(define direccionEjemplos1 "/Users/patriciamayotejedor/Documents/Private Development/UNED/Machine Learning/MachineLearning/ejemplos.scm")
 
 
 ; Ejercicio 8
@@ -316,7 +316,7 @@
   (- 1 precisionTotal)))
 
 ;  Ejercicio 17
-(define direccionEjemplos2 "/Users/patriciamayotejedor/Documents/Private Development/UNED/Machine Learning/tema1/ejemplos2.scm")
+(define direccionEjemplos2 "/Users/patriciamayotejedor/Documents/Private Development/UNED/Machine Learning/MachineLearning/ejemplos2.scm")
 ;; Preparar ejemplos
 (define ejemplos2 (leer-ejemplos direccionEjemplos2))
 (define ejemplos-sin-clase2 (map (lambda(x) (drop-right x 1)) ejemplos2))
