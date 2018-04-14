@@ -456,8 +456,17 @@
 
 (define testNumerico
     (lambda (limites valorEjemplo)
-      (define inferior (car limites))
-      (define superior (list-ref limites 1))
+      (define estandarizarLimites
+        (lambda (limites)
+          (cond
+            [(equal? limites (list '*))'(-inf.0 +inf.0)]
+            [(= (length limites) 0) '(2 1)]
+            [(= (length limites) 1) (list limites limites)]
+            [else limites]
+            )))
+      (define limitesEstandarizados (estandarizarLimites limites))
+      (define inferior (car limitesEstandarizados))
+      (define superior (list-ref limitesEstandarizados 1))
       ; Test limite inferior
       (define limiteInferior
         (lambda (limite valor)
@@ -602,3 +611,194 @@
       [(and (concepto-CL>= c2 c1) (not (concepto-CL>= c1 c2))) -1] 
       )
   )
+
+
+; Ejercicio 9
+; (especializaciones-atributo-nominal '((bueno) (5 40) (subiendo) (estable) (10 60) (si)) 2 (car ejemplos))
+(define tiposDeAtributo
+  (lambda (nombre atributos)
+    (define atributoEncontrado (assoc nombre atributos))
+    (list-ref atributoEncontrado 1)))
+
+(define (especializaciones-atributo-nominal concepto-CL indice metadatos)
+  (let*
+      ((atributoReferenciado (list-ref concepto-CL indice))
+       (tiposDeAtributo (list-ref (list-ref metadatos indice) 1)))
+    (define crearListaEspecializaciones
+      (lambda (concepto-CL indice tiposDeAtributo listaEspecializada)
+        (if (eq? (length tiposDeAtributo) (length listaEspecializada))
+            listaEspecializada
+            (let* (
+                  (indiceDelTipo (length listaEspecializada))
+                  (conceptoEspecializado (list-set concepto-CL indice (list (list-ref tiposDeAtributo indiceDelTipo))))
+                  )
+              (crearListaEspecializaciones
+               concepto-CL
+               indice
+               tiposDeAtributo
+               (append listaEspecializada (list conceptoEspecializado)))))))
+    (if (equal? atributoReferenciado (list '*))
+        (crearListaEspecializaciones concepto-CL indice tiposDeAtributo '())
+        (list (list-set concepto-CL indice empty)))))
+
+; Ejercicio 10
+; (generalizaciones-atributo-nominal '(() (5 40) (subiendo) (estable) (10 60) (si)) 0 (car ejemplos))
+(define (generalizaciones-atributo-nominal concepto-CL indice metadatos)
+  (let*
+      ((atributoReferenciado (list-ref concepto-CL indice))
+       (tiposDeAtributo (list-ref (list-ref metadatos indice) 1)))
+    (define crearListaGeneralizaciones
+      (lambda (concepto-CL indice tiposDeAtributo listaGeneralizada)
+        (if (eq? (length tiposDeAtributo) (length listaGeneralizada))
+            listaGeneralizada
+            (let* (
+                  (indiceDelTipo (length listaGeneralizada))
+                  (conceptoGeneralizado (list-set concepto-CL indice (list (list-ref tiposDeAtributo indiceDelTipo))))
+                  )
+              (crearListaGeneralizaciones
+               concepto-CL
+               indice
+               tiposDeAtributo
+               (append listaGeneralizada (list conceptoGeneralizado)))))))
+    (if (equal? atributoReferenciado empty)
+        (crearListaGeneralizaciones concepto-CL indice tiposDeAtributo '())
+        (list (list-set concepto-CL indice (list '*))))))
+
+
+; Ejercicio 11
+;(generalizacion-atributo-numerico '((soleado)(30)(20)(si)) 1 '(soleado 25 40 si -))
+;(generalizacion-atributo-numerico '((soleado)(15 20)(20)(si)) 1 '(soleado 25 40 si +))
+;(generalizacion-atributo-numerico '((soleado)(*)(20)(si)) 1 '(soleado 25 40 si +))
+
+(define ejemploEsPositivo
+    (lambda (ejemplo)
+      (eq? (last ejemplo) '+)))
+
+; Test limite inferior
+(define limiteInferior
+  (lambda (limite valor)
+    (cond
+      [(number? limite) (> valor limite)]
+      [(list? limite) (>= valor (car limite))]
+      [else #f])))
+
+; Test limite superior
+(define limiteSuperior
+  (lambda (limite valor)
+    (cond
+      [(number? limite) (< valor limite)]
+      [(list? limite) (<= valor (car limite))]
+      [else #f])))
+
+; Estandarizar limites
+(define estandarizarLimites
+        (lambda (limites)
+          (cond
+            [(equal? limites (list '*))'(-inf.0 +inf.0)]
+            [(= (length limites) 0) '(2 1)]
+            [(= (length limites) 1) (list limites limites)]
+            [else limites]
+            )))
+
+(define (generalizaciones-atributo-numerico concepto-CL indice ejemplo)
+  (let*
+      ((limiteEnConcepto (list-ref concepto-CL indice))
+       (valorEnEjemplo (list-ref ejemplo indice)))
+    (define (generalizarConcepto limiteEnConcepto valorEnEjemplo)
+      (let* (
+             (limitesEstandarizados (estandarizarLimites limiteEnConcepto))
+             (inferior (car limitesEstandarizados))
+             (superior (list-ref limitesEstandarizados 1)))
+        (cond
+          [(eq? limiteEnConcepto empty) (list valorEnEjemplo)]
+          [(not (limiteInferior inferior valorEnEjemplo)) (list (list valorEnEjemplo) superior)]
+          [(not (limiteSuperior superior valorEnEjemplo)) (list inferior (list valorEnEjemplo))]
+          [else (list '*)]
+          )
+        ))
+    (cond
+      [(not (ejemploEsPositivo ejemplo)) concepto-CL]
+      [(testNumerico limiteEnConcepto valorEnEjemplo) concepto-CL]
+      [else (list-set concepto-CL indice (generalizarConcepto limiteEnConcepto valorEnEjemplo))]
+      )
+    ))
+
+; Ejercicio 12
+(define (especializaciones-atributo-numerico concepto-CL indice ejemplo)
+    (let*
+      ((limiteEnConcepto (list-ref concepto-CL indice))
+       (valorEnEjemplo (list-ref ejemplo indice))
+       (limitesEstandarizados (estandarizarLimites limiteEnConcepto))
+       (inferior (car limitesEstandarizados))
+       (superior (list-ref limitesEstandarizados 1)))
+    (cond
+      [(ejemploEsPositivo ejemplo) (list concepto-CL)]
+      [(not (testNumerico limiteEnConcepto valorEnEjemplo)) (list concepto-CL)]
+      [(eq? limiteEnConcepto empty) (list concepto-CL)]
+      [else (list
+             (list-set concepto-CL indice (list inferior valorEnEjemplo))
+             (list-set concepto-CL indice (list valorEnEjemplo superior))
+             )])
+    ))
+
+; Ejercicio 13
+; (generalizaciones-CL '(() (5 20) (subiendo) (estable) (10 60) (si)) (car ejemplos) '(bueno 26 estable subiendo 43 si +))
+(define (generalizaciones-CL concepto-CL metadatos ejemplo)
+   (define crearGeneralizaciones
+     (lambda (concepto-CL metadatos ejemplo indice listaGeneralizaciones)
+       (if (eq? indice (- (length ejemplo) 1))
+           listaGeneralizaciones
+           (let* (
+                  (atributoConcepto (list-ref concepto-CL indice))
+                  (atributoEjemplo (list-ref ejemplo indice))
+                  (esNominal (list? (list-ref (list-ref metadatos indice) 1))))
+             
+             (if esNominal
+                 (crearGeneralizaciones
+                  concepto-CL
+                  metadatos
+                  ejemplo
+                  (+ indice 1)
+                  (append listaGeneralizaciones
+                          (generalizaciones-atributo-nominal concepto-CL indice metadatos))
+                 )
+                 (crearGeneralizaciones
+                  concepto-CL
+                  metadatos
+                  ejemplo
+                  (+ indice 1)
+                  (append listaGeneralizaciones
+                          (list (generalizaciones-atributo-numerico concepto-CL indice ejemplo))))))
+       )))
+    (crearGeneralizaciones concepto-CL metadatos ejemplo 0 '()))
+
+; Ejercicio 14
+; (especializaciones-CL '((bueno) (5 40) (subiendo) (estable) (10 60) (si)) (car ejemplos) '(bueno 26 estable subiendo 43 si -))
+(define (especializaciones-CL concepto-CL metadatos ejemplo)
+ (define crearEspecializaciones
+     (lambda (concepto-CL metadatos ejemplo indice listaEspecializaciones)
+       (if (eq? indice (- (length ejemplo) 1))
+           listaEspecializaciones
+           (let* (
+                  (atributoConcepto (list-ref concepto-CL indice))
+                  (atributoEjemplo (list-ref ejemplo indice))
+                  (esNominal (list? (list-ref (list-ref metadatos indice) 1))))
+             
+             (if esNominal
+                 (crearEspecializaciones
+                  concepto-CL
+                  metadatos
+                  ejemplo
+                  (+ indice 1)
+                  (append listaEspecializaciones
+                          (especializaciones-atributo-nominal concepto-CL indice metadatos))
+                 )
+                 (crearEspecializaciones
+                  concepto-CL
+                  metadatos
+                  ejemplo
+                  (+ indice 1)
+                  (append listaEspecializaciones
+                          (especializaciones-atributo-numerico concepto-CL indice ejemplo)))))
+       )))
+    (crearEspecializaciones concepto-CL metadatos ejemplo 0 '()))
