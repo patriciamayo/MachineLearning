@@ -490,7 +490,7 @@
        (drop-right atributos 1)))))
 
 
-; Ejemplo 2
+; Ejercicio 2
 ;(CLi '((*) (5 40) (subiendo) (estable) (10 60) (si)) '(bueno 20 subiendo estable 50 si ))
 (define (CLi concepto-CL ejemplo-sin-clase)
  (let*
@@ -508,12 +508,12 @@
            (obtener-al-azar tiposDeClases)))
    (append ejemplo-sin-clase (list clase))))
 
-; Ejemplo 3
+; Ejercicio 3
 (define CLgeneral '((*) (-inf.0 +inf.0) (*) (*) (-inf.0 +inf.0) (*)))
 (define CLespecifico '(() (1 0) () () (1 0) ()))
 (define CLcercano '((*) (18 +inf.0) (subiendo) (*) (5 60) (no)))
 
-; Ejemplo 4
+; Ejercicio 4
 (define (concepto-CL-mas-general metadatos)
     (map
        (lambda (dato)
@@ -522,7 +522,7 @@
             [else (list '*)]))
        metadatos))
 
-; Ejemplo 5
+; Ejercicio 5
  (define (concepto-CL-mas-especifico metadatos)
     (map
        (lambda (dato)
@@ -532,7 +532,7 @@
        metadatos))
 
 
-; Ejemplo 6
+; Ejercicio 6
 (define atributoNominal
     (lambda (t1 t2)
       (cond
@@ -559,30 +559,46 @@
         (lambda (limite)
           (if (number? limite) (- limite 0.1) (car limite))
           ))
-       (pasaTestNominal
+      )
+  (define pasaTestNominal
+   (lambda (t1 t2)
           (cond
             ; Primero nos aseguramos que podemos usar car
             [(and (pair? t1) (pair? t2) (symbol? (car t1)) (symbol? (car t2))) #t]
             ; Si pasa el test nominal significa que es igual o mas general
             [(testNominal t1 t2) #t] 
             [(eq? t2 empty) #t]
-            [else #f]))
-       (pasaTestNumerico
-        (cond
-          ; Controlando casos con'(*)
-          [(equal? (despejarInfinitos t1) (list '*)) #t]
-          [(equal? (despejarInfinitos t1) (despejarInfinitos t2)) #t]
-          [(equal? (despejarInfinitos t2) (list '*)) #f]
-          ; Segun longitud
-          [(> (length t1) (length t2)) #t]
-          [(< (length t1) (length t2)) #f]
-          [(and (number? (car t1)) (number? (car t2))) #t]
-          ; Segun amplitud de rango
-          [(> (- (valor (list-ref t1 1)) (valor (car t1)))
-              (- (valor (list-ref t2 1)) (valor (car t2)))) #t]
-          [else #f]
-          )
-        )
-      )
-      (if esTestNominal pasaTestNominal pasaTestNumerico)
+            [else #f])))
+       (define pasaTestNumerico
+         (lambda (t1 t2)
+           (cond
+             ; Controlando casos con'(*)
+             [(equal? (despejarInfinitos t1) (list '*)) #t]
+             [(equal? (despejarInfinitos t1) (despejarInfinitos t2)) #t]
+             [(equal? (despejarInfinitos t2) (list '*)) #f]
+             ; Segun longitud
+             [(> (length t1) (length t2)) #t]
+             [(< (length t1) (length t2)) #f]
+             ;[(and (number? (car t1)) (number? (car t2))) #t]
+             ; Segun amplitud de rango
+             ;[(> (- (valor (list-ref t1 1)) (valor (car t1)))
+             ;    (- (valor (list-ref t2 1)) (valor (car t2)))) #t]
+             ;[else #f]
+             [else #t]
+          )))
+      (if esTestNominal (pasaTestNominal t1 t2) (pasaTestNumerico t1 t2))
     ))
+
+; Ejercicio 7
+(define (concepto-CL>= c1 c2)
+    (andmap (lambda (concepto1 concepto2)
+                                (test-CL>= concepto1 concepto2)) c1 c2))
+
+; Ejercicio 8
+(define (cmp-concepto-CL c1 c2)
+    (cond
+      [(and (concepto-CL>= c1 c2) (not (concepto-CL>= c2 c1))) 1]
+      [(and (concepto-CL>= c1 c2) (concepto-CL>= c2 c1)) 0]
+      [(and (concepto-CL>= c2 c1) (not (concepto-CL>= c1 c2))) -1] 
+      )
+  )
