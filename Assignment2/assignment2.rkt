@@ -488,15 +488,13 @@
     (let* ()
       (if (not(= (length concepto-CL) (length ejemplo-sin-clase))) #f
       (andmap
-       (lambda (atributoTest atributoEjemplo atributoTipo)
-         (define tipoDeTest (list-ref atributoTipo 1))
+       (lambda (atributoTest atributoEjemplo)
          (cond
-            [(eq? tipoDeTest 'numerico) (testNumerico atributoTest atributoEjemplo)]
-            [(list? tipoDeTest) (testNominal atributoTest atributoEjemplo)]
-            [else #f]))
+            [(number? atributoEjemplo) (testNumerico atributoTest atributoEjemplo)]
+            [else (testNominal atributoTest atributoEjemplo)]))
        concepto-CL
        ejemplo-sin-clase
-       (drop-right atributos 1)))))
+       ))))
 
 
 ; Ejercicio 2
@@ -518,18 +516,18 @@
    (append ejemplo-sin-clase (list clase))))
 
 ; Ejercicio 3
-(define CLgeneral '((*) (-inf.0 +inf.0) (*) (*) (-inf.0 +inf.0) (*)))
+(define CLgeneral '((*) (*) (*) (*) (*) (*)))
 (define CLespecifico '(() (1 0) () () (1 0) ()))
 (define CLcercano '((*) (18 +inf.0) (subiendo) (*) (5 60) (no)))
 
 ; Ejercicio 4
 (define (concepto-CL-mas-general metadatos)
-    (map
+    (drop-right (map
        (lambda (dato)
          (cond
             [(number? dato) (list '-inf.0 '+inf.0)]
             [else (list '*)]))
-       metadatos))
+       metadatos)1))
 
 ; Ejercicio 5
  (define (concepto-CL-mas-especifico metadatos)
@@ -802,3 +800,111 @@
                           (especializaciones-atributo-numerico concepto-CL indice ejemplo)))))
        )))
     (crearEspecializaciones concepto-CL metadatos ejemplo 0 '()))
+
+; Ejercicio 15
+; Devuelve una lista con tantos elementos como clases hay. Cada elemento contiene todos los casos de esa clase
+(define separarClases
+  (lambda (ejemplos)
+    (define tiposDeClases (atributo 'clase ejemplos))
+    (define casos (list-tail ejemplos 1))
+    (define casosAgrupadosPorClase
+      (lambda (index tiposDeClases casos agrupacion)
+        (if (= index (length tiposDeClases))
+            agrupacion
+            (let ((claseAgrupada  (filter
+                               (lambda (caso)
+                                 (eqv? (list-ref caso (- (length caso) 1)) (list-ref tiposDeClases index)))
+                               casos)))
+              (casosAgrupadosPorClase (+ index 1) tiposDeClases casos (append agrupacion (list claseAgrupada)))))))
+    (casosAgrupadosPorClase 0 tiposDeClases casos '())))
+
+(define PSET (car (separarClases ejemplos)))
+(define NSET (list-ref (separarClases ejemplos) 1))
+
+(define (EGS01 PSET NSET CSET HSET)
+  (let* ()
+    (define HParaEliminar
+      (filter (lambda (H)(not (andmap (lambda (P)
+                                (match-CL H (drop-right P 1))) PSET))) HSET))
+     (define HParaEliminarYAnadir
+      (filter (lambda (H)(not (ormap (lambda (N)
+                                (match-CL H (drop-right N 1))) NSET))) HSET))
+    (define HSETfinal
+      (remq* (append HParaEliminar HParaEliminarYAnadir) HSET))
+    (define CSETfinal (append HParaEliminarYAnadir CSET))
+    (define numeroNegativasAceptadas
+      (lambda (concepto)
+        (length (filter
+                 (lambda (N) (match-CL concepto (drop-right N 1))) NSET))))
+    (if (equal? HSETfinal empty)
+        CSETfinal
+        (let* ()
+          (define SPECS
+            (append-map
+             (lambda (H)
+               (define negativasDeH (numeroNegativasAceptadas H))
+               (define especialiazaciones
+                 (especializaciones-CL H (car ejemplos) '(bueno 26 estable subiendo 43 si +)))
+               (filter
+                (lambda (especialiazacion)
+                  (< (numeroNegativasAceptadas especialiazacion) (numeroNegativasAceptadas H)))
+                especialiazaciones)
+               ) HSETfinal))
+          (define NEWSET
+            (filter
+              (lambda (S)
+                (andmap
+                     (lambda (C) (eq? (cmp-concepto-CL S C) -1)) CSETfinal))
+            SPECS))
+        (EGS01 PSET NSET CSETfinal NEWSET)))))
+
+(define (EGS ejemplos)
+  (let* ()
+  (define (EGS0 PSET NSET CSET HSET)
+  (let* ()
+    (define HParaEliminar
+      (filter (lambda (H)(not (andmap (lambda (P)
+                                (match-CL H (drop-right P 1))) PSET))) HSET))
+     (define HParaEliminarYAnadir
+      (filter (lambda (H)(not (ormap (lambda (N)
+                                (match-CL H (drop-right N 1))) NSET))) HSET))
+    (define HSETfinal
+      (remq* (append HParaEliminar HParaEliminarYAnadir) HSET))
+    (define CSETfinal (append HParaEliminarYAnadir CSET))
+    (define numeroNegativasAceptadas
+      (lambda (concepto)
+        (length (filter
+                 (lambda (N) (match-CL concepto (drop-right N 1))) NSET))))
+    (if (equal? HSETfinal empty)
+        CSETfinal
+        (let* ()
+          (define SPECS
+            (append-map
+             (lambda (H)
+               (define negativasDeH (numeroNegativasAceptadas H))
+               (define especialiazaciones
+                 (especializaciones-CL H (car ejemplos) positivoAlAzar))
+               (filter
+                (lambda (especialiazacion)
+                  (< (numeroNegativasAceptadas especialiazacion) (numeroNegativasAceptadas H)))
+                especialiazaciones)
+               ) HSETfinal))
+          (define NEWSET
+            (filter
+              (lambda (S)
+                (andmap
+                     (lambda (C) (eq? (cmp-concepto-CL S C) -1)) CSETfinal))
+            SPECS))
+        (EGS0 PSET NSET CSETfinal NEWSET)))))
+  (define PSET (car (separarClases ejemplos)))
+  (define NSET (list-ref (separarClases ejemplos) 1))
+  (define positivoAlAzar (obtener-al-azar PSET))
+  (define listaCSET (EGS0 PSET NSET '() (list (concepto-CL-mas-general (car ejemplos)))))
+  (if (equal? listaCSET empty) '() (obtener-al-azar listaCSET))))
+
+
+; Ejercicio 16
+(define direccionAgaricus "/Users/patriciamayotejedor/Documents/Private Development/UNED/Machine Learning/MachineLearning/Assignment2/agaricus-lepiota.scm")
+(define agaricus-lepiota (leer-ejemplos direccionAgaricus))
+(define direccionIonosphere  "/Users/patriciamayotejedor/Documents/Private Development/UNED/Machine Learning/MachineLearning/Assignment2/ionosphere.scm")
+(define ionosphere (leer-ejemplos direccionIonosphere))
