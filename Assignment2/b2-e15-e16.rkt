@@ -120,3 +120,7 @@
 ;; El EGS es exhaustivo y esto tiene un alto coste computacional, en el caso agaricus-lepiota ha tardado bastante mas en resolverlo en comparacion con nuetsros ejemplos
 ;;> (EGS agaricus-lepiota)
 ;;'((*) (*) (*) (*) (*) (*) (*) (*) (*) (*) (r) (*) (*) (*) (*) (*) (*) (*) (*) (*) (*) (*))
+(define direccionAgaricus "/Users/patriciamayotejedor/Documents/Private Development/UNED/Machine Learning/MachineLearning/Assignment2/agaricus-lepiota.scm")
+(define agaricus-lepiota (leer-ejemplos direccionAgaricus))
+(define direccionIonosphere  "/Users/patriciamayotejedor/Documents/Private Development/UNED/Machine Learning/MachineLearning/Assignment2/ionosphere.scm")
+(define ionosphere (leer-ejemplos direccionIonosphere))
