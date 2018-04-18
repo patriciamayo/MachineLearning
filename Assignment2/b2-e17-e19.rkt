@@ -180,7 +180,7 @@
 )
 
 ;;Ejercicio 19
-(he-tardado <minutos> 'b2-e19)
+(he-tardado 20 'b2-e19)
 ;; Curiosamente con HGS y ionosphere se devuelve el concepto mas general posible, mientras que con el EGS se devolvia vacio
 ;;> (HGS ionosphere)
 ;;'(((*) (*) (*) (*) (*) (*) (*) (*) (*) (*) (*) (*) (*) (*) (*) (*) (*) (*) (*) (*) (*) (*)))

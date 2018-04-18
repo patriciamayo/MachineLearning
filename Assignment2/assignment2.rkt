@@ -1082,3 +1082,47 @@
   (define listaCSET (HGS0 PSET NSET '() (list (concepto-CL-mas-general (car ejemplos)))))
   listaCSET
 )
+
+; Ejercicio 19
+; (HGS ionosphere)
+; (HGS agaricus-lepiota)
+
+; Ejercicio 23
+; (traducir '(perspectiva (soleado nublado lluvioso)) 'lluvioso)
+(define (traducir meta-atributo valor)
+  (let* ((tipos (list-ref meta-atributo 1))
+         (esNominal (list? tipos)))
+    (cond
+      [esNominal (index-of tipos valor)]
+      [else valor])))
+
+
+; Ejercicio 24
+;(nuevo-conceptoUU (car ejemplos) 1)
+(define (nuevo-conceptoUU metadatos init)
+(let* ((vector (map (lambda (x)(* init (- (* 2 (random)) 1))) metadatos)))
+  (list metadatos vector)))
+
+
+; Ejercicio 25
+;(define AtributosProfesor '((perspectiva (soleado nublado lluvioso)) (temperatura numerico) (humedad numerico) (viento (si no)) (clase (+ -))))
+;(match-LUU (list AtributosProfesor '(0 1 1 0 -30)) '(lluvioso 10 20 si))
+(define (productoEscalar vector1 vector2)
+  (apply + (map * vector1 vector2)))
+
+(define (match-LUU conceptoUU ejemplo-sin-clase)
+  (let* ((metadatos (list-ref conceptoUU 0))
+         (vectorPesos (list-ref conceptoUU 1))
+         (ejemploTraducido
+          (map
+           (lambda (meta-atributo valor)
+             (traducir meta-atributo valor))
+           metadatos ejemplo-sin-clase))
+         (producto (productoEscalar vectorPesos (append ejemploTraducido '(1)))))
+    (if (eq? producto 0) #t (positive? producto))))
+
+; Ejercicio 26
+;(LUUi (list AtributosProfesor '(0 1 1 0 -31)) '(lluvioso 10 20 si))
+(define (LUUi conceptoUU ejemplo-sin-clase)
+(let* ((pasaUmbral (match-LUU conceptoUU ejemplo-sin-clase)))
+  (if pasaUmbral (append ejemplo-sin-clase (list '+)) (append ejemplo-sin-clase (list '-)))))
