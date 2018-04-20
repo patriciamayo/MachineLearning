@@ -1126,3 +1126,51 @@
 (define (LUUi conceptoUU ejemplo-sin-clase)
 (let* ((pasaUmbral (match-LUU conceptoUU ejemplo-sin-clase)))
   (if pasaUmbral (append ejemplo-sin-clase (list '+)) (append ejemplo-sin-clase (list '-)))))
+
+
+; Ejercicio 30
+(define concepto-UU (nuevo-conceptoUU (car ejemplos) 1))
+(define (PRM concepto-UU ejemplos)
+  (let* ((n 0.2)
+         (ISET (list-tail ejemplos 1)))
+  (define recorrerISET
+    (lambda (indice ISET H)
+      (if (eq? indice (length ISET))
+          H
+          (let* ((I (list-ref ISET indice))
+                 (C (last I))
+                 (P (last (LUUi H (drop-right I 1))))
+                 (S (cond
+                      [(and (eq? P '-) (eq? C '+)) 1]
+                      [(and (eq? P '+) (eq? C '-)) -1]
+                      [else empty])))
+            (if (eq? P C)
+                (recorrerISET (+ indice 1) ISET H)
+                (let* ((ATTS (first H))
+                       (vector (last H))
+                       (umbral (last vector)))
+                  (define vectorAjustado
+                    (map
+                     (lambda (W i A)
+                            (define V (traducir A i))
+                            (+ (* S n V) W))
+                     (drop-right vector 1) (drop-right I 1) (drop-right ATTS 1)))
+                  (recorrerISET (+ indice 1) ISET (list ATTS (append vectorAjustado (list (+ (* S n) umbral)))))))))))
+     (recorrerISET 0 ISET concepto-UU)))
+
+; Ejercicio 31
+(define COUNT 1000)
+(define (PCP ejemplos)
+(let* ((H concepto-UU);(nuevo-conceptoUU (car ejemplos) 1))
+       (contador COUNT)
+       (ISET (list-tail ejemplos 1)))
+  (define recorrerCOUNT
+    (lambda (H ISET COUNT)
+      (if (eq? COUNT 0) H
+          (let* ((NO-ERRORS (andmap
+                             (lambda (I)
+                                   (match-LUU H (drop-right I 1)))
+                             ISET)))
+            (if NO-ERRORS H
+                (recorrerCOUNT (PRM concepto-UU ejemplos) ISET (- COUNT 1)))))))
+  (recorrerCOUNT H ISET contador)))
