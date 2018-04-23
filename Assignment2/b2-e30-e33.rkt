@@ -79,15 +79,79 @@
   (recorrerCOUNT H ISET contador)))
 
 ;;Ejercicio 32
-(he-tardado <minutos> 'b2-e32)
-;;<comentarios>
+(he-tardado 400 'b2-e32)
+;; Este ejercicio ha sido realmente complicado, cada parametro influencia muchisimo los resultados, he ido jugando con ellos hasta dar con un resultado que tiene sentido
+;; Al final lo mejor ha sido aceptar un error del 15% y poner el gain a 0.2
+;; Los resultados coinciden con las expectativas, donde la perspectiva y la humedad son los atributos mas relevantes
+;;> (LMS ejemplos)
+;;'(0.42701965659393204
+;;  -0.046724185514876226
+;;  0.05610928793221992
+;;  0.30324967370273836
+;;  0.44549003049310454
+;;  0.21926560010929708
+;;  0.3616204059722472)
 (define COUNT 1000)
 (define (LMS ejemplos)
-<codigo>)
+(let* ((n 0.2) ; gain
+       (a 0.9) ; momentum
+       (Minimum-Error 15)
+       (conceptoUU (nuevo-conceptoUU (car ejemplos) 0.5))
+       (ATTS (first conceptoUU))
+       (H (last conceptoUU))
+       (Aa (map (lambda (A) 0) ATTS))
+       (contador COUNT)
+       (ISET (list-tail ejemplos 1)))
+
+  (define recorrerATTS
+    (lambda (indice ATTS Aa H)
+      (if (eq? indice (length ATTS))
+          (list (list Aa) (list H))
+          (let* ((A (list-ref ATTS indice))
+                 (GRADIENT
+                        (apply + (map
+                                  (lambda (I)
+                                    (define ITraducido (traducirEjemplo ATTS (drop-right I 1)))
+                                    (define O (apply + ITraducido))
+                                    (define P (productoEscalar H (append ITraducido '(1))))
+                                    ;(define d (* P (/ (- 1 P) 100) (/ (- O P) 100)))
+                                    (define d (* P (- 1 P) (- O P)))
+                                    (define V (traducir A (list-ref I indice)))
+                                    (* n d V))
+                                  ISET)))
+                 (viejoAa (list-ref Aa indice))
+                 (nuevoAa (+ GRADIENT (* a viejoAa)))
+                 (W (list-ref H indice)))
+            (recorrerATTS
+             (+ indice 1)
+             ATTS
+             (list-set Aa indice nuevoAa)
+             (list-set H indice (+ nuevoAa W)))))))
+  
+  (define recorrerCOUNT
+    (lambda (H ISET COUNT Aa)
+      (if (eq? COUNT 0) H
+          (let* (
+                 (TOTAL-ERROR
+                  (apply + (map
+                            (lambda (I)
+                              (define ITraducido (traducirEjemplo ATTS (drop-right I 1)))
+                              (define O (apply + ITraducido))
+                              (define P (productoEscalar H (append ITraducido '(1))))
+                              (sqr (/ (- O P) 100)))
+                            ISET))))
+            (if (< TOTAL-ERROR Minimum-Error)
+                H
+                (let* ((actualizarAayH (recorrerATTS 0 ATTS Aa H))
+                       (nuevoH (list-ref actualizarAayH 1))
+                       (nuevoAa (list-ref actualizarAayH 0)))
+                  (recorrerCOUNT nuevoH ISET (- COUNT 1) nuevoAa)))))))
+  (recorrerCOUNT H ISET COUNT Aa)))
 
 ;;Ejercicio 33
 (he-tardado <minutos> 'b2-e33)
-;;<comentarios>
+;;> (stratified-cross-validation PCP LUUi ejemplosJuntos 3)
+;; 0.6805555555555555
 
 
 

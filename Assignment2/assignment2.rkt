@@ -299,9 +299,9 @@
 ;  Ejercicio 16
 ; Precision es el numero de aciertos dividido por el numero total de casos
 (define precision
-  (lambda (ejemplos extension)
-  (define casosEjemplos (cdr ejemplos))
-  (define casosExtension (cdr extension))
+  (lambda (casosEjemplos casosExtension)
+  ;(define casosEjemplos (cdr ejemplos))
+  ;(define casosExtension (cdr extension))
   (define numeroCasos (length casosEjemplos))
   (define numeroAciertos (length (filter (lambda (caso) caso) (map (lambda (casoEjemplo casoExtension)
                                     (eq? (last casoEjemplo) (last casoExtension))) casosEjemplos casosExtension))
@@ -311,8 +311,8 @@
 
 ; Error es el numero de errores dividido por el numero total de casos, o lo que es lo mismo, 1 - precision
 (define error
-  (lambda (ejemplos extension)
-  (define precisionTotal (precision ejemplos extension))
+  (lambda (casosEjemplos casosExtension)
+  (define precisionTotal (precision casosEjemplos casosExtension))
   (- 1 precisionTotal)))
 
 ;  Ejercicio 17
@@ -323,8 +323,8 @@
 ;; Pasar ejemplos por el interprete A0i
 (define extension2 (map (lambda(x) (A0i esencia x)) ejemplos-sin-clase2))
 ;; Definir precision y error
-(define precisionEjemplos2 (precision ejemplos2 extension2))
-(define errorEjemplo2 (error ejemplos2 extension2))
+(define precisionEjemplos2 (precision (cdr ejemplos2) (cdr extension2)))
+(define errorEjemplo2 (error (cdr ejemplos2) (cdr extension2)))
 
 ;  Ejercicio 18
 ; A1
@@ -359,15 +359,15 @@
 
 (define esenciaA1 (A1 ejemplos))
 (define extensionA1i (map (lambda(x) (A1i esenciaA1 x)) ejemplos-sin-clase))
-(define precisionEjemplosA1 (precision ejemplos extensionA1i))
+(define precisionEjemplosA1 (precision (cdr ejemplos) (cdr extensionA1i)))
 
 
 ; Ejercicio 19
 ;; Pasar ejemplos por el interprete A1i
 (define extensionA1iEjemplos2 (map (lambda(x) (A1i esenciaA1 x)) ejemplos-sin-clase2))
 ;; Definir precision y error
-(define precisionA1Ejemplos2 (precision ejemplos2 extensionA1iEjemplos2))
-(define errorA1Ejemplo2 (error ejemplos2 extensionA1iEjemplos2))
+(define precisionA1Ejemplos2 (precision (cdr ejemplos2) (cdr extensionA1iEjemplos2)))
+(define errorA1Ejemplo2 (error (cdr ejemplos2) (cdr extensionA1iEjemplos2)))
 )
 
 ; Ejercicio 22
@@ -378,7 +378,7 @@
       (define ejemplos-sin-clase (map (lambda(x) (drop-right x 1)) ejemplos))
       (define cogerEsencia (esencia ejemplos))
       (define cogerExtension (map (lambda(x) (interprete cogerEsencia x)) ejemplos-sin-clase))
-      (precision ejemplos cogerExtension)
+      (precision (cdr ejemplos) (cdr cogerExtension))
       ))
 ; Se usan cada vez solo un ejemplo para evaluar (con todos los ejemplos)
 (define leave-one-out
@@ -418,8 +418,8 @@
       (lambda (foldParaEvaluar)
         (define foldsDeEntrenamiento (remq foldParaEvaluar ejemplosEnFolds))
         (define ejemplosEntrenamiento (append (list atributos) (append* foldsDeEntrenamiento)))
-        (define ejemplosEvaluacion (append (list atributos) foldParaEvaluar))
-        (holdout entrenamiento interprete ejemplosEntrenamiento ejemplosEvaluacion)))
+        ;(define ejemplosEvaluacion (append (list atributos) foldParaEvaluar))
+        (holdout entrenamiento interprete ejemplosEntrenamiento foldParaEvaluar)))
     (define sumaPrecisiones (apply + (map (lambda (fold)
          (evaluarFold fold)) ejemplosEnFolds)))
     (exact->inexact (/ sumaPrecisiones numeroFolds))))
@@ -432,8 +432,8 @@
       (lambda (foldParaEvaluar)
         (define foldsDeEntrenamiento (remq foldParaEvaluar ejemplosEnFolds))
         (define ejemplosEntrenamiento (append (list atributos) (append* foldsDeEntrenamiento)))
-        (define ejemplosEvaluacion (append (list atributos) foldParaEvaluar))
-        (holdout entrenamiento interprete ejemplosEntrenamiento ejemplosEvaluacion)))
+        ;(define ejemplosEvaluacion (append (list atributos) foldParaEvaluar))
+        (holdout entrenamiento interprete ejemplosEntrenamiento foldParaEvaluar)))
     (define sumaPrecisiones (apply + (map (lambda (fold)
          (evaluarFold fold)) ejemplosEnFolds)))
     (exact->inexact (/ sumaPrecisiones numeroFolds))))
@@ -1110,6 +1110,12 @@
 (define (productoEscalar vector1 vector2)
   (apply + (map * vector1 vector2)))
 
+(define (traducirEjemplo metadatos ejemplo-sin-clase)
+  (map
+   (lambda (meta-atributo valor)
+     (traducir meta-atributo valor))
+   metadatos ejemplo-sin-clase))
+
 (define (match-LUU conceptoUU ejemplo-sin-clase)
   (let* ((metadatos (list-ref conceptoUU 0))
          (vectorPesos (list-ref conceptoUU 1))
@@ -1159,9 +1165,9 @@
      (recorrerISET 0 ISET concepto-UU)))
 
 ; Ejercicio 31
-(define COUNT 1000)
+(define COUNT 1)
 (define (PCP ejemplos)
-(let* ((H concepto-UU);(nuevo-conceptoUU (car ejemplos) 1))
+(let* ((H (nuevo-conceptoUU (car ejemplos) 1))
        (contador COUNT)
        (ISET (list-tail ejemplos 1)))
   (define recorrerCOUNT
@@ -1174,3 +1180,61 @@
             (if NO-ERRORS H
                 (recorrerCOUNT (PRM concepto-UU ejemplos) ISET (- COUNT 1)))))))
   (recorrerCOUNT H ISET contador)))
+
+
+; Ejercicio 32
+(define (LMS ejemplos)
+(let* ((n 0.2) ; gain
+       (a 0.9) ; momentum
+       (Minimum-Error 15)
+       (conceptoUU (nuevo-conceptoUU (car ejemplos) 0.5))
+       (ATTS (first conceptoUU))
+       (H (last conceptoUU))
+       (Aa (map (lambda (A) 0) ATTS))
+       (contador COUNT)
+       (ISET (list-tail ejemplos 1)))
+
+  (define recorrerATTS
+    (lambda (indice ATTS Aa H)
+      (if (eq? indice (length ATTS))
+          (list (list Aa) (list H))
+          (let* ((A (list-ref ATTS indice))
+                 (GRADIENT
+                        (apply + (map
+                                  (lambda (I)
+                                    (define ITraducido (traducirEjemplo ATTS (drop-right I 1)))
+                                    (define O (apply + ITraducido))
+                                    (define P (productoEscalar H (append ITraducido '(1))))
+                                    ;(define d (* P (/ (- 1 P) 100) (/ (- O P) 100)))
+                                    (define d (* P (- 1 P) (- O P)))
+                                    (define V (traducir A (list-ref I indice)))
+                                    (* n d V))
+                                  ISET)))
+                 (viejoAa (list-ref Aa indice))
+                 (nuevoAa (+ GRADIENT (* a viejoAa)))
+                 (W (list-ref H indice)))
+            (recorrerATTS
+             (+ indice 1)
+             ATTS
+             (list-set Aa indice nuevoAa)
+             (list-set H indice (+ nuevoAa W)))))))
+  
+  (define recorrerCOUNT
+    (lambda (H ISET COUNT Aa)
+      (if (eq? COUNT 0) H
+          (let* (
+                 (TOTAL-ERROR
+                  (apply + (map
+                            (lambda (I)
+                              (define ITraducido (traducirEjemplo ATTS (drop-right I 1)))
+                              (define O (apply + ITraducido))
+                              (define P (productoEscalar H (append ITraducido '(1))))
+                              (sqr (/ (- O P) 100)))
+                            ISET))))
+            (if (< TOTAL-ERROR Minimum-Error)
+                H
+                (let* ((actualizarAayH (recorrerATTS 0 ATTS Aa H))
+                       (nuevoH (list-ref actualizarAayH 1))
+                       (nuevoAa (list-ref actualizarAayH 0)))
+                  (recorrerCOUNT nuevoH ISET (- COUNT 1) nuevoAa)))))))
+  (recorrerCOUNT H ISET COUNT Aa)))
