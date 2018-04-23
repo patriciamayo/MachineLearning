@@ -150,8 +150,14 @@
 
 ;;Ejercicio 33
 (he-tardado <minutos> 'b2-e33)
-;;> (stratified-cross-validation PCP LUUi ejemplosJuntos 3)
-;; 0.6805555555555555
+;; He tardado mucho porque la funcion precision no era la correcta
+;; PCP ha sido mas efectivo que LMS, LMS se enfoca en reducir el error, mas que en eliminar clasificaciones errones como el PCP
+;; Ademas el LMS es una generaliazacion del PCP, por lo que se entiende que el PCP haya funcionado mejor para este caso
+;; He intentado compararlos con el mismo gain n = 0.2
+;;> (stratified-cross-validation LMS LUUi ejemplosJuntos 2)
+;;0.4423076923076923
+;;> (stratified-cross-validation PCP LUUi ejemplosJuntos 2)
+;;0.5544871794871795
 
 
 

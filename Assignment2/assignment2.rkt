@@ -1237,4 +1237,4 @@
                        (nuevoH (list-ref actualizarAayH 1))
                        (nuevoAa (list-ref actualizarAayH 0)))
                   (recorrerCOUNT nuevoH ISET (- COUNT 1) nuevoAa)))))))
-  (recorrerCOUNT H ISET COUNT Aa)))
+  (append (list ATTS) (list (recorrerCOUNT H ISET COUNT Aa)))))
