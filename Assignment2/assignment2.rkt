@@ -1273,3 +1273,134 @@
   (let* ((ejemplo-mas-cercano (IBi concepto-IB ejemplos-sin-clase))
          (ejemplo-con-clase-de-IB (append ejemplo-sin-clase (list (last concepto-IB)))))
    (equal? ejemplo-mas-cercano ejemplo-con-clase-de-IB)))
+
+
+
+; Ejercico 37
+
+(define (nuevo-conceptoNB metadatos)
+  (do ((cuentas '(0))
+       (valores '())
+       (i 0 (+ i 1))
+       )
+    ((= i (- (length metadatos) 1))
+     (let ((c (reverse cuentas)))
+       (list (cons '+ c)(cons '- c)));valor devuelto
+     )
+    (set! valores (cadr (list-ref metadatos i)))
+    (cond
+      ((eq? valores 'numerico)
+       (set! cuentas (cons '(numerico 0 0) cuentas)))
+      (else ;nominales
+       (set! cuentas
+             (cons (map (lambda(x) (cons x 0))
+                        valores)
+                   cuentas))))))
+
+(define (INB concepto-NB ejemplo)
+(let* ((listaPositiva (first concepto-NB))
+       (listaNegativa (last concepto-NB)))
+
+  (define valorNumerico
+    (lambda (valorNB valorEjemplo)
+      (define actualizarSuma (list-set valorNB 1 (+ (list-ref valorNB 1) valorEjemplo))) ; sumar valores
+      (list-set actualizarSuma 2 (+ (list-ref valorNB 2) (expt valorEjemplo 2))) ; suma de cuadrados -> distribucion normal
+      ))
+
+  (define valorNominal
+    (lambda (valorNB valorEjemplo)
+      (define index-valorEjemplo (index-where valorNB (lambda (atributoNB) (eq? (car atributoNB) valorEjemplo))))
+      (define atributoNB (list-ref valorNB index-valorEjemplo)) ; buscar el par a cambiar
+      (list-set valorNB index-valorEjemplo (cons (car atributoNB) (+ (cdr atributoNB) 1))) ; sumar 1 al par
+      ))
+  
+   (define (actualizarNB listaNB ejemplo-sin-clase)
+     (let* ((clase (first listaNB))
+            (contadorClase (+ (list-ref listaNB 1) 1)))
+       (define atributos
+         (map
+          (lambda (atributoNB atributoEjemplo)
+            (if (pair? (first atributoNB))
+                (valorNominal atributoNB atributoEjemplo)
+                (valorNumerico atributoNB atributoEjemplo)))
+          (list-tail listaNB 2) ejemplo-sin-clase))
+       (append (list clase) (list contadorClase) atributos)
+       ))
+  (if (eq? (last ejemplo) '+)
+      (list  (actualizarNB listaPositiva (drop-right ejemplo 1)) listaNegativa)
+      (list  listaPositiva (actualizarNB listaNegativa (drop-right ejemplo 1))))
+  ))
+
+
+
+; Ejercicio 38
+(define (NB ejemplos)
+ (let* ((casos (list-tail ejemplos 1))
+        (nuevoNB (nuevo-conceptoNB (car ejemplos))))
+   (define recorrerEjemplos
+     (lambda (indice concepto-NB casos)
+       (if (eq? indice (length casos))
+           concepto-NB
+           (recorrerEjemplos
+            (+ indice 1)
+            (INB concepto-NB (list-ref casos indice))
+            casos))))
+   (recorrerEjemplos 0 nuevoNB casos)))
+
+
+; Ejercicio 39
+(define (media x n) (exact->inexact(/ x n)))
+
+; Sumatorio (a - b)^2 =  Sumatorio (a^2 - 2ab + b^2)
+; Sumatorio a^2 = x2
+; Sumatorio b^2 = n * m^2
+; Sumatorio a = n * m
+; b = m
+(define (varianza x2 m n)
+(let* ((b^2 (* n (expt m 2)))
+       (a (* n m)))
+  (/ (+ (- x2 (* 2 a m)) b^2)  (- n 1))))
+
+; Ejercicio 40
+; (probabilidades '+ (NB ejemplos) '(bueno 27 subiendo estable 54 si))
+(define (probabilidades clase concepto-NB ejemplo-sin-clase)
+(let* ((listaClaseNB
+        (if (eq? clase '+)
+            (first concepto-NB)
+            (last concepto-NB)))
+       (contadorClase (list-ref listaClaseNB 1)))
+
+  (define probabilidadNominal
+    (lambda (valorNB valorEjemplo contadorClase)
+      (define index-valorEjemplo (index-where valorNB (lambda (atributoNB) (eq? (car atributoNB) valorEjemplo))))
+      (define atributoNB (list-ref valorNB index-valorEjemplo))
+      (/ (cdr atributoNB) contadorClase)))
+
+  (define (probabilidadNumerica valorNB valorEjemplo contadorClase)
+    (let* ((mediaAtributo (media (list-ref valorNB 1) contadorClase))
+           (varianzaAtributo (varianza (last valorNB) mediaAtributo contadorClase))
+           (raiz (sqrt (* 2 pi varianzaAtributo)))
+           (exponenteEuler (/ (expt (- valorEjemplo mediaAtributo) 2) (* 2 varianzaAtributo))))
+      (* (/ 1 raiz) (exp (- exponenteEuler)))))
+  
+  (map
+   (lambda (atributoNB atributoEjemplo)
+     (if (pair? (first atributoNB))
+         (probabilidadNominal atributoNB atributoEjemplo contadorClase)
+         (probabilidadNumerica atributoNB atributoEjemplo contadorClase)))
+   (list-tail listaClaseNB 2) ejemplo-sin-clase)))
+
+
+; Ejercicio 41
+(define (NBi concepto-NB ejemplo-sin-clase)
+(let* ((probabilidadPositiva (apply * (probabilidades '+ concepto-NB ejemplo-sin-clase)))
+       (probabilidadNegativa (apply * (probabilidades '- concepto-NB ejemplo-sin-clase))))
+  (cond
+    [(> probabilidadPositiva probabilidadNegativa) (append ejemplo-sin-clase (list '+))]
+    [(< probabilidadPositiva probabilidadNegativa) (append ejemplo-sin-clase (list '-))]
+    [else (append ejemplo-sin-clase (obtener-al-azar (list '+ '-)))])
+))
+
+(define (match-NB concepto-NB ejemplo-sin-clase)
+  (let* ((clasificacion (NBi concepto-NB ejemplo-sin-clase)))
+    (eq? '+ (last clasificacion))))
