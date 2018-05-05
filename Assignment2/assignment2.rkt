@@ -293,7 +293,8 @@
 
 ;  Ejercicio 15
 (define esencia (A0 ejemplos))
-(define ejemplos-sin-clase (map (lambda(x) (drop-right x 1)) ejemplos))
+(define casos (list-tail ejemplos 1))
+(define ejemplos-sin-clase (map (lambda(x) (drop-right x 1)) casos))
 (define extension (map (lambda(x) (A0i esencia x)) ejemplos-sin-clase))
 
 ;  Ejercicio 16
@@ -1238,3 +1239,37 @@
                        (nuevoAa (list-ref actualizarAayH 0)))
                   (recorrerCOUNT nuevoH ISET (- COUNT 1) nuevoAa)))))))
   (append (list ATTS) (list (recorrerCOUNT H ISET COUNT Aa)))))
+
+
+; Ejercicio 34
+; (distancia '(soleado 10 20 si) '(soleado 15 21 no -))   ->    5.196152422706632
+(define (IB ejemplos) ejemplos)
+(define (distancia ejemplo-sin-clase ejemplo)
+  (let* ((ejemplo-y (drop-right ejemplo 1)))
+    (define valor
+      (lambda (x y)
+        (cond
+          [(number? x) (expt (- y x) 2)]
+          [(eq? x y) 0]
+          [else 1])))
+    (inexact->exact(sqrt (apply + (map
+                    (lambda (x y)
+                      (valor x y))
+                    ejemplo-sin-clase ejemplo-y))))))
+
+; Ejercicio 35
+(define concepto-IB '(lluvia 5 bajando bajando 100 si -))
+(define (IBi concepto-IB ejemplos-sin-clase)
+(let* ((distancias (map
+                    (lambda (ejemplo-sin-clase)
+                      (distancia ejemplo-sin-clase concepto-IB)) ejemplos-sin-clase))
+       (min-distancia (apply min distancias))
+       (index-de-min-distancia (index-of distancias min-distancia))
+       (ejemplo-mas-cercano (list-ref ejemplos-sin-clase index-de-min-distancia)))
+  (append ejemplo-mas-cercano (list (last concepto-IB)))))
+
+; Ejercicio 36
+(define (match-IB concepto-IB ejemplo-sin-clase)
+  (let* ((ejemplo-mas-cercano (IBi concepto-IB ejemplos-sin-clase))
+         (ejemplo-con-clase-de-IB (append ejemplo-sin-clase (list (last concepto-IB)))))
+   (equal? ejemplo-mas-cercano ejemplo-con-clase-de-IB)))

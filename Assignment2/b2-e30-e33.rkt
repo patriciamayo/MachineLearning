@@ -149,7 +149,7 @@
   (recorrerCOUNT H ISET COUNT Aa)))
 
 ;;Ejercicio 33
-(he-tardado <minutos> 'b2-e33)
+(he-tardado 60 'b2-e33)
 ;; He tardado mucho porque la funcion precision no era la correcta
 ;; PCP ha sido mas efectivo que LMS, LMS se enfoca en reducir el error, mas que en eliminar clasificaciones errones como el PCP
 ;; Ademas el LMS es una generaliazacion del PCP, por lo que se entiende que el PCP haya funcionado mejor para este caso
