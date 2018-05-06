@@ -1079,9 +1079,15 @@
   )
   (define PSET (car (separarClases ejemplos)))
   (define NSET (list-ref (separarClases ejemplos) 1))
+  (define conceptoGeneral (list (concepto-CL-mas-general (car ejemplos))))
   (define positivoAlAzar (obtener-al-azar PSET))
-  (define listaCSET (HGS0 PSET NSET '() (list (concepto-CL-mas-general (car ejemplos)))))
-  listaCSET
+  (define listaCSET (HGS0 PSET NSET '() conceptoGeneral))
+  (cond
+    [(empty? listaCSET) listaCSET]
+    [(equal? listaCSET conceptoGeneral) '()]
+    [else (first listaCSET)]
+    )
+  ;(if (empty? listaCSET) listaCSET (first listaCSET))
 )
 
 ; Ejercicio 19
@@ -1467,9 +1473,11 @@
 
 
 ; Ejercicio 2
-; (funcion-match 'HGS)
+; (funcion-match HGS)
+;> (eval `(,(funcion-match HGS) '((soleado)(*)) '(soleado si)))
+;#t
 
-(define *funciones-match* '((HGS . match-CL)(HTC . match-TC)(NB . match-NB)(IB . match-IB)(LMS . match-LUU)(PCP . match-LUU)))
+(define *funciones-match* '((HGS . match-CL)(NB . match-NB)(IB . match-IB)(LMS . match-LUU)(PCP . match-LUU)))
 
 (define (funcion-match algoritmo)
 (let* ((funcionEncontrada (find
@@ -1477,3 +1485,45 @@
                            (equal? (eval (car funcion)) algoritmo))
                          *funciones-match*)))
   (cdr funcionEncontrada)))
+
+
+; Ejercicio 3
+
+;(define (NSC0 algoritmo PSET NSET DNF)
+;(let* ((metadatos (car ejemplos))
+;       (nuevosEjemplos (append (list metadatos) PSET NSET)))
+;  (if (empty? PSET)
+;      DNF
+;      (let* ((D (algoritmo nuevosEjemplos))
+;             (nuevoDNF (append DNF (list D)))
+;             (instanciasCubiertas (filter
+;                                   (lambda (P)
+;                                     ((eval (funcion-match algoritmo)) D (drop-right P 1)))
+;                                   PSET)))
+;        (if (empty? instanciasCubiertas)
+;            DNF
+;            (NSC0 algoritmo (remq* instanciasCubiertas PSET) NSET nuevoDNF)))
+;  )))
+
+(define (NSC algoritmo ejemplos)
+ (let*((clasesSeparadas (separarClases ejemplos))
+       (PSET (car clasesSeparadas))
+       (NSET (list-ref clasesSeparadas 1)))
+   
+   (define (NSC0 algoritmo PSET NSET DNF)
+     (let* ((metadatos (car ejemplos))
+            (nuevosEjemplos (append (list metadatos) PSET NSET)))
+       (if (empty? PSET)
+           DNF
+           (let* ((D (algoritmo nuevosEjemplos))
+                  (nuevoDNF (append DNF (list D)))
+                  (instanciasCubiertas (filter
+                                        (lambda (P)
+                                          ((eval (funcion-match algoritmo)) D (drop-right P 1)))
+                                        PSET)))
+             (if (empty? instanciasCubiertas)
+                 DNF
+                 (NSC0 algoritmo (remq* instanciasCubiertas PSET) NSET nuevoDNF)))
+           )))
+   
+   (NSC0 algoritmo PSET NSET '())))
