@@ -405,7 +405,7 @@
 (define ejemplosEvaluacion (append (list atributos) (list-ref ejemplosSeparados 1)))
 (define holdout
     (lambda (entrenamiento interprete ejemplosEntrenamiento ejemplosEvaluacion)
-      (define ejemplosEvaluacionSinClase (map (lambda(x) (drop-right x 1)) ejemplosEvaluacion))
+      (define ejemplosEvaluacionSinClase (list-tail (map (lambda(x) (drop-right x 1)) ejemplosEvaluacion) 1))
       (define entrenar (entrenamiento ejemplosEntrenamiento))
       (define interpretar (map (lambda(x) (interprete entrenar x)) ejemplosEvaluacionSinClase))
       (precision ejemplosEvaluacion interpretar)))
@@ -1179,7 +1179,7 @@
                                    (match-LUU H (drop-right I 1)))
                              ISET)))
             (if NO-ERRORS H
-                (recorrerCOUNT (PRM concepto-UU ejemplos) ISET (- COUNT 1)))))))
+                (recorrerCOUNT (PRM H ejemplos) ISET (- COUNT 1)))))))
   (recorrerCOUNT H ISET contador)))
 
 
@@ -1243,7 +1243,7 @@
 
 ; Ejercicio 34
 ; (distancia '(soleado 10 20 si) '(soleado 15 21 no -))   ->    5.196152422706632
-(define (IB ejemplos) ejemplos)
+(define (IB ejemplos) (list-tail ejemplos 1))
 (define (distancia ejemplo-sin-clase ejemplo)
   (let* ((ejemplo-y (drop-right ejemplo 1)))
     (define valor
@@ -1258,21 +1258,20 @@
                     ejemplo-sin-clase ejemplo-y))))))
 
 ; Ejercicio 35
-(define concepto-IB '(lluvia 5 bajando bajando 100 si -))
-(define (IBi concepto-IB ejemplos-sin-clase)
+(define (IBi concepto-IB ejemplo-sin-clase)
 (let* ((distancias (map
-                    (lambda (ejemplo-sin-clase)
-                      (distancia ejemplo-sin-clase concepto-IB)) ejemplos-sin-clase))
+                    (lambda (ejemplo)
+                      (distancia ejemplo-sin-clase ejemplo)) concepto-IB))
        (min-distancia (apply min distancias))
        (index-de-min-distancia (index-of distancias min-distancia))
-       (ejemplo-mas-cercano (list-ref ejemplos-sin-clase index-de-min-distancia)))
-  (append ejemplo-mas-cercano (list (last concepto-IB)))))
+       (concepto-mas-cercano (list-ref concepto-IB index-de-min-distancia)))
+  (append ejemplo-sin-clase (list (last concepto-mas-cercano)))))
+
 
 ; Ejercicio 36
 (define (match-IB concepto-IB ejemplo-sin-clase)
-  (let* ((ejemplo-mas-cercano (IBi concepto-IB ejemplos-sin-clase))
-         (ejemplo-con-clase-de-IB (append ejemplo-sin-clase (list (last concepto-IB)))))
-   (equal? ejemplo-mas-cercano ejemplo-con-clase-de-IB)))
+  (let* ((concepto-mas-cercano (IBi concepto-IB ejemplo-sin-clase)))
+   (eq? '+ (last concepto-mas-cercano))))
 
 
 
@@ -1404,3 +1403,39 @@
 (define (match-NB concepto-NB ejemplo-sin-clase)
   (let* ((clasificacion (NBi concepto-NB ejemplo-sin-clase)))
     (eq? '+ (last clasificacion))))
+
+
+; Ejercicio 42
+; ====================== LMS =======================
+;> (stratified-cross-validation LMS CLi ejemplos 10)
+;0.2
+;> (stratified-cross-validation LMS CLi ionosphere 10)
+;0.4696825396825397
+;> (stratified-cross-validation LMS CLi agaricus-lepiota 10)
+;0.5003674888965638
+; ====================== HGS =======================
+;> (stratified-cross-validation HGS CLi ejemplos 10)
+;0.4
+;> (stratified-cross-validation HGS CLi ionosphere 10)
+;0.45285714285714285
+; ====================== PCP =======================
+;> (stratified-cross-validation PCP LUUi ejemplos 10)
+;0.35
+;> (stratified-cross-validation PCP LUUi ionosphere 10)
+;0.5643650793650794
+;> (stratified-cross-validation PCP LUUi agaricus-lepiota 10)
+;0.5140298656681148
+; ====================== IB =======================
+;> (stratified-cross-validation IB IBi ejemplos 10)
+;0.3
+;> (stratified-cross-validation IB IBi ionosphere 10)
+;0.5752380952380952
+;> (stratified-cross-validation IB IBi agaricus-lepiota 10)
+;0.5204389568526228
+; ====================== NB =======================
+;> (stratified-cross-validation NB NBi ejemplos 10)
+;0.3
+;> (stratified-cross-validation NB NBi ionosphere 10)
+;0.0
+;> (stratified-cross-validation NB NBi agaricus-lepiota 10)
+;0.5171139851792608

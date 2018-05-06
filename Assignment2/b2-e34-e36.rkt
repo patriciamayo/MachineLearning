@@ -27,7 +27,20 @@
 ;; De verdad que creo que se necesitan ejemplos en todos los ejercicios para entender bien que es lo que se pide
 ;; Lo que he hecho es buscar de entre todos los ejemplos el que sea mas cercano al concepto-IB, y luego agregarle a este la clase del concepto-IB
 (define concepto-IB '(lluvia 5 bajando bajando 100 si -))
-(define (IBi concepto-IB ejemplos-sin-clase)
+
+; Al hacer el ejercicio 42 me he dado cuenta de que lo habia entendido mal. Se pasa solo un ejemplo-sin-clase como dice en el pdf (errata en la plantilla)
+; Es el concepto-IB el que tiene todos los ejemplos, y con el que hay que comparar las distancias.
+(define (IBi concepto-IB ejemplo-sin-clase)
+(let* ((distancias (map
+                    (lambda (ejemplo)
+                      (distancia ejemplo-sin-clase ejemplo)) concepto-IB))
+       (min-distancia (apply min distancias))
+       (index-de-min-distancia (index-of distancias min-distancia))
+       (concepto-mas-cercano (list-ref concepto-IB index-de-min-distancia)))
+  (append ejemplo-sin-clase (list (last concepto-mas-cercano)))))
+
+
+(define (IBiPrimerIntento concepto-IB ejemplos-sin-clase)
 (let* ((distancias (map
                     (lambda (ejemplo-sin-clase)
                       (distancia ejemplo-sin-clase concepto-IB)) ejemplos-sin-clase))
@@ -49,10 +62,16 @@
 ;; #t
 ;; > (match-IB concepto-IB '(soleado 5 bajando bajando 100 si))
 ;; #f
-(define (match-IB concepto-IB ejemplo-sin-clase)
+(define (match-IBPrimerIntento concepto-IB ejemplo-sin-clase)
   (let* ((ejemplo-mas-cercano (IBi concepto-IB ejemplos-sin-clase))
          (ejemplo-con-clase-de-IB (append ejemplo-sin-clase (list (last concepto-IB)))))
    (equal? ejemplo-mas-cercano ejemplo-con-clase-de-IB)))
+
+;; Al final al cambiar el IBi he entendido lo que se esperaba de la funcion match
+(define (match-IB concepto-IB ejemplo-sin-clase)
+  (let* ((concepto-mas-cercano (IBi concepto-IB ejemplo-sin-clase)))
+   (eq? '+ (last concepto-mas-cercano))))
+
 
 
 
