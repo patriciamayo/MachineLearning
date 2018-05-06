@@ -1489,21 +1489,21 @@
 
 ; Ejercicio 3
 
-;(define (NSC0 algoritmo PSET NSET DNF)
-;(let* ((metadatos (car ejemplos))
-;       (nuevosEjemplos (append (list metadatos) PSET NSET)))
-;  (if (empty? PSET)
-;      DNF
-;      (let* ((D (algoritmo nuevosEjemplos))
-;             (nuevoDNF (append DNF (list D)))
-;             (instanciasCubiertas (filter
-;                                   (lambda (P)
-;                                     ((eval (funcion-match algoritmo)) D (drop-right P 1)))
-;                                   PSET)))
-;        (if (empty? instanciasCubiertas)
-;            DNF
-;            (NSC0 algoritmo (remq* instanciasCubiertas PSET) NSET nuevoDNF)))
-;  )))
+(define (NSC0 algoritmo PSET NSET DNF)
+(let* ((metadatos (car ejemplos))
+       (nuevosEjemplos (append (list metadatos) PSET NSET)))
+  (if (empty? PSET)
+      DNF
+      (let* ((D (algoritmo nuevosEjemplos))
+             (nuevoDNF (append DNF (list D)))
+             (instanciasCubiertas (filter
+                                   (lambda (P)
+                                     ((eval (funcion-match algoritmo)) D (drop-right P 1)))
+                                   PSET)))
+        (if (empty? instanciasCubiertas)
+            DNF
+            (NSC0 algoritmo (remq* instanciasCubiertas PSET) NSET nuevoDNF)))
+  )))
 
 (define (NSC algoritmo ejemplos)
  (let*((clasesSeparadas (separarClases ejemplos))
@@ -1527,3 +1527,33 @@
            )))
    
    (NSC0 algoritmo PSET NSET '())))
+
+; Ejercicio 5
+
+(define casosDeClase
+  (lambda (ejemplos clase)
+    (filter
+     (lambda (ejemplo)
+       (equal? clase (last ejemplo)))
+     (list-tail ejemplos 1))))
+
+(define (MSC0 algoritmo ejemplos)
+(let* ((casos (list-tail ejemplos 1))
+       (CSET (atributo 'clase ejemplos))
+       (RULES-PER-CLASS (map
+               (lambda (CLASS)
+                 (define PSET (casosDeClase ejemplos CLASS))
+                 (define NSET (remq* PSET casos))
+                 (define DNF (NSC0 algoritmo PSET NSET '()))
+                 (map
+                  (lambda (D)
+                    (list D '=> CLASS))
+                  DNF))
+               CSET)))
+  (append* RULES-PER-CLASS)
+  ))
+
+(define (MSC algoritmo ejemplos)
+(append
+ (MSC0 algoritmo ejemplos)
+ (list `(match-CL ,(make-list (- (length (car ejemplos)) 1) '(*)) => ,(A0 ejemplos)))))

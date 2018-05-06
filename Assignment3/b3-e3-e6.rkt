@@ -96,13 +96,37 @@
 ; crash
 
 ;;Ejercicio 5
-(he-tardado <minutos> 'b3-e5)
-;;<comentarios>
-(define (MSC0 algoritmo ejemplos
-<codigo>)
+(he-tardado 90 'b3-e5)
+;; Creo que hay problemas ocn las funciones match, ya que estan definidas de tal manera que si es '+ devuelve true, y sino devuelve false
+;; En todos los ejemplos hemos jugado siempre con dos clases asique no se muy bien que esperar
+;; Entiendo como el MSC aplica el divide y venceras para soportar varias clases pero me da miedo que yo haya hardcoded las clases + y - en alguna parte
+(define casosDeClase
+  (lambda (ejemplos clase)
+    (filter
+     (lambda (ejemplo)
+       (equal? clase (last ejemplo)))
+     (list-tail ejemplos 1))))
+
+(define (MSC0 algoritmo ejemplos)
+(let* ((casos (list-tail ejemplos 1))
+       (CSET (atributo 'clase ejemplos))
+       (RULES-PER-CLASS (map
+               (lambda (CLASS)
+                 (define PSET (casosDeClase ejemplos CLASS))
+                 (define NSET (remq* PSET casos))
+                 (define DNF (NSC0 algoritmo PSET NSET '()))
+                 (map
+                  (lambda (D)
+                    (list D '=> CLASS))
+                  DNF))
+               CSET)))
+  (append* RULES-PER-CLASS)
+  ))
 
 (define (MSC algoritmo ejemplos)
-<codigo>)
+(append
+ (MSC0 algoritmo ejemplos)
+ (list `(match-CL ,(make-list (- (length (car ejemplos)) 1) '(*)) => ,(A0 ejemplos)))))
 
 ;;Ejercicio 6
 (he-tardado <minutos> 'b3-e6)
