@@ -129,10 +129,86 @@
  (list `(match-CL ,(make-list (- (length (car ejemplos)) 1) '(*)) => ,(A0 ejemplos)))))
 
 ;;Ejercicio 6
-(he-tardado <minutos> 'b3-e6)
-;;<comentarios>
+(he-tardado 500 'b3-e6)
+;; He tenido que arreglar muchos algoritmos para que funcionase. Por ejemplo con el algoritmo PCP es necesario saber si la clase es positiva or negativa,
+;; por lo que se compara con '+ y '-, lo que ha ocasionado problemas al intentar usar los casos de poker y lymphography (tienen mas de dos clases)
+;; Errores en el formato de LMS tambien han sido arreglados
+;; Por lo general los resultados son muy malos, solo con HGS y LMS ionosphere se alcanza el 60%
+;; Los conceptos generados por HGS no garantizan que se cubran todos los positivos y ninguno de los negativos, por lo que es indicado para datasets
+;; donde pudiese haber ruido por lo que que el HGS y su busqueda heuristica es ideal para este dataset
 
 
+
+;========================= SUBALGORITMOS ====================
+(define (MSC-HGS ejemplos)
+(let* ()
+(append
+ (MSC0 HGS ejemplos)
+ (list `(match-CL ,(make-list (- (length (car ejemplos)) 1) '(*)) => ,(A0 ejemplos))))))
+
+(define (MSC-LMS ejemplos)
+(let* ()
+(append
+ (MSC0 LMS ejemplos)
+ (list `(match-CL ,(make-list (- (length (car ejemplos)) 1) '(*)) => ,(A0 ejemplos))))))
+
+(define (MSC-PCP ejemplos)
+ (let* ()
+(append
+ (MSC0 PCP ejemplos)
+ (list `(match-CL ,(make-list (- (length (car ejemplos)) 1) '(*)) => ,(A0 ejemplos))))))
+
+
+;========================= HGS ====================
+
+> (stratified-cross-validation MSC-HGS LDi ejemplos 10)
+0.25
+> (stratified-cross-validation MSC-HGS LDi ionosphere 10)
+0.618015873015873
+
+> (stratified-cross-validation MSC-HGS LDi agaricus-lepiota 10)
+Sin resultados
+
+> (stratified-cross-validation MSC-HGS LDi poker 10)
+0.4994002399040385
+
+> (stratified-cross-validation MSC-HGS LDi lymphography 10)
+0.47857142857142854
+
+
+;========================= PCP ====================
+
+> (stratified-cross-validation MSC-PCP LDi ejemplos 10)
+0.35
+
+> (stratified-cross-validation MSC-PCP LDi ionosphere 10)
+0.3642857142857142
+
+> (stratified-cross-validation MSC-PCP LDi agaricus-lepiota 10)
+0.4896598682735596
+
+> (stratified-cross-validation MSC-PCP LDi lymphography 10)
+0.5166666666666666
+
+> (stratified-cross-validation MSC-PCP LDi poker 10)
+0.39316273490603754
+
+;========================= LMS ====================
+
+> (stratified-cross-validation MSC-LMS LDi ejemplos 10)
+0.4
+
+> (stratified-cross-validation MSC-LMS LDi ionosphere 10)
+0.5958730158730159
+
+> (stratified-cross-validation MSC-LMS LDi agaricus-lepiota 10)
+0.5174802622410459
+
+> (stratified-cross-validation MSC-LMS LDi poker 10)
+Sin resultados
+
+> (stratified-cross-validation MSC-LMS LDi lymphography 10)
+0.3666666666666666
 
 
 

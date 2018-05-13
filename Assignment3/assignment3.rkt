@@ -292,10 +292,10 @@
   (append ejemplo-sin-clase (list concepto)))
 
 ;  Ejercicio 15
-(define esencia (A0 ejemplos))
-(define casos (list-tail ejemplos 1))
-(define ejemplos-sin-clase (map (lambda(x) (drop-right x 1)) casos))
-(define extension (map (lambda(x) (A0i esencia x)) ejemplos-sin-clase))
+;(define esencia (A0 ejemplos))
+;(define casos (list-tail ejemplos 1))
+;(define ejemplos-sin-clase (map (lambda(x) (drop-right x 1)) casos))
+;(define extension (map (lambda(x) (A0i esencia x)) ejemplos-sin-clase))
 
 ;  Ejercicio 16
 ; Precision es el numero de aciertos dividido por el numero total de casos
@@ -319,13 +319,13 @@
 ;  Ejercicio 17
 (define direccionEjemplos2 "/Users/patriciamayotejedor/Documents/Private Development/UNED/Machine Learning/MachineLearning/ejemplos2.scm")
 ;; Preparar ejemplos
-(define ejemplos2 (leer-ejemplos direccionEjemplos2))
-(define ejemplos-sin-clase2 (map (lambda(x) (drop-right x 1)) ejemplos2))
+;(define ejemplos2 (leer-ejemplos direccionEjemplos2))
+;(define ejemplos-sin-clase2 (map (lambda(x) (drop-right x 1)) ejemplos2))
 ;; Pasar ejemplos por el interprete A0i
-(define extension2 (map (lambda(x) (A0i esencia x)) ejemplos-sin-clase2))
+;(define extension2 (map (lambda(x) (A0i esencia x)) ejemplos-sin-clase2))
 ;; Definir precision y error
-(define precisionEjemplos2 (precision (cdr ejemplos2) (cdr extension2)))
-(define errorEjemplo2 (error (cdr ejemplos2) (cdr extension2)))
+;(define precisionEjemplos2 (precision (cdr ejemplos2) (cdr extension2)))
+;(define errorEjemplo2 (error (cdr ejemplos2) (cdr extension2)))
 
 ;  Ejercicio 18
 ; A1
@@ -358,21 +358,21 @@
 (define (A1i paresClaseFrecuencia ejemplo-sin-clase)
   (append ejemplo-sin-clase (list (obtener-al-azar0 paresClaseFrecuencia))))
 
-(define esenciaA1 (A1 ejemplos))
-(define extensionA1i (map (lambda(x) (A1i esenciaA1 x)) ejemplos-sin-clase))
-(define precisionEjemplosA1 (precision (cdr ejemplos) (cdr extensionA1i)))
+;(define esenciaA1 (A1 ejemplos))
+;(define extensionA1i (map (lambda(x) (A1i esenciaA1 x)) ejemplos-sin-clase))
+;(define precisionEjemplosA1 (precision (cdr ejemplos) (cdr extensionA1i)))
 
 
 ; Ejercicio 19
 ;; Pasar ejemplos por el interprete A1i
-(define extensionA1iEjemplos2 (map (lambda(x) (A1i esenciaA1 x)) ejemplos-sin-clase2))
+;(define extensionA1iEjemplos2 (map (lambda(x) (A1i esenciaA1 x)) ejemplos-sin-clase2))
 ;; Definir precision y error
-(define precisionA1Ejemplos2 (precision (cdr ejemplos2) (cdr extensionA1iEjemplos2)))
-(define errorA1Ejemplo2 (error (cdr ejemplos2) (cdr extensionA1iEjemplos2)))
+;(define precisionA1Ejemplos2 (precision (cdr ejemplos2) (cdr extensionA1iEjemplos2)))
+;(define errorA1Ejemplo2 (error (cdr ejemplos2) (cdr extensionA1iEjemplos2)))
 )
 
 ; Ejercicio 22
-(define ejemplosJuntos (mezclar ejemplos ejemplos2))
+;(define ejemplosJuntos (mezclar ejemplos ejemplos2))
 ; Se usan todos los ejemplos para entrenar y para evaluar
 (define resustitution
     (lambda (esencia interprete ejemplos)
@@ -399,10 +399,10 @@
     (exact->inexact (/ numeroAciertos (length casos)))))
 
 ; Ejercicio 23
-(define ejemplosSeparados (separar 0.67 ejemplosJuntos))
-(define atributos (car ejemplosJuntos))
-(define ejemplosEntrenamiento (append (list atributos) (list-ref ejemplosSeparados 0)))
-(define ejemplosEvaluacion (append (list atributos) (list-ref ejemplosSeparados 1)))
+;(define ejemplosSeparados (separar 0.67 ejemplosJuntos))
+;(define atributos (car ejemplosJuntos))
+;(define ejemplosEntrenamiento (append (list atributos) (list-ref ejemplosSeparados 0)))
+;(define ejemplosEvaluacion (append (list atributos) (list-ref ejemplosSeparados 1)))
 (define holdout
     (lambda (entrenamiento interprete ejemplosEntrenamiento ejemplosEvaluacion)
       (define ejemplosEvaluacionSinClase (list-tail (map (lambda(x) (drop-right x 1)) ejemplosEvaluacion) 1))
@@ -500,21 +500,28 @@
 
 ; Ejercicio 2
 ;(CLi '((*) (5 40) (subiendo) (estable) (10 60) (si)) '(bueno 20 subiendo estable 50 si ))
-(define (CLi concepto-CL ejemplo-sin-clase)
- (let*
-     ( ;; Variables 
-      (casos (cdr ejemplos))
-      (ejemploQuePasaTest (findf
-                          (lambda (caso)
-                            (define casoSinClase (drop-right caso 1))
-                            (match-CL concepto-CL casoSinClase)) casos))
-      (tiposDeClases (atributo 'clase ejemplos)))
+;(define (CLi concepto-CL ejemplo-sin-clase)
+; (let*
+;     ( ;; Variables 
+;      (casos (cdr ejemplos))
+;     (ejemploQuePasaTest (findf
+;                          (lambda (caso)
+;                            (define casoSinClase (drop-right caso 1))
+;                            (match-CL concepto-CL casoSinClase)) casos))
+;      (tiposDeClases (atributo 'clase ejemplos)))
    ;; Devolver clase segun el ejemplo que ha pasado el test
-   (define clase
-       (if (list? ejemploQuePasaTest)
-           (list-ref ejemploQuePasaTest (- (length ejemploQuePasaTest) 1))
-           (obtener-al-azar tiposDeClases)))
-   (append ejemplo-sin-clase (list clase))))
+;   (define clase
+;       (if (list? ejemploQuePasaTest)
+;           (list-ref ejemploQuePasaTest (- (length ejemploQuePasaTest) 1))
+;           (obtener-al-azar tiposDeClases)))
+;   (append ejemplo-sin-clase (list clase))))
+
+(define (CLi concepto-CL ejemplo-sin-clase)
+(let* ()
+  (if (match-CL concepto-CL ejemplo-sin-clase)
+      (append ejemplo-sin-clase (list '+))
+      (append ejemplo-sin-clase (list '-))
+      )))
 
 ; Ejercicio 3
 (define CLgeneral '((*) (*) (*) (*) (*) (*)))
@@ -819,11 +826,12 @@
               (casosAgrupadosPorClase (+ index 1) tiposDeClases casos (append agrupacion (list claseAgrupada)))))))
     (casosAgrupadosPorClase 0 tiposDeClases casos '())))
 
-(define PSET (car (separarClases ejemplos)))
-(define NSET (list-ref (separarClases ejemplos) 1))
+;(define PSET (car (separarClases ejemplos)))
+;(define NSET (list-ref (separarClases ejemplos) 1))
 
 (define (EGS01 PSET NSET CSET HSET)
   (let* ()
+    (define ejemplos (leer-ejemplos direccionEjemplos1))
     (define HParaEliminar
       (filter (lambda (H)(not (andmap (lambda (P)
                                 (match-CL H (drop-right P 1))) PSET))) HSET))
@@ -930,6 +938,7 @@
 (define (HGS0 PSET NSET CSET HSET)
     (let* ((Beam-Size +)
            (positivoAlAzar (obtener-al-azar PSET)))
+      (define ejemplos (leer-ejemplos direccionEjemplos1))
       (define getOPENyCLOSE
         (lambda (indice PSET NSET CSET HSET OPEN-SET)
           (if (eq? indice (length HSET))
@@ -1004,6 +1013,7 @@
 
 
 (define (HGS ejemplos)
+  (let * ()
   (define (HGS0 PSET NSET CSET HSET)
     (let* ((Beam-Size 4)
            (positivoAlAzar (obtener-al-azar PSET)))
@@ -1088,7 +1098,7 @@
     [else (first listaCSET)]
     )
   ;(if (empty? listaCSET) listaCSET (first listaCSET))
-)
+))
 
 ; Ejercicio 19
 ; (HGS ionosphere)
@@ -1142,7 +1152,7 @@
 
 
 ; Ejercicio 30
-(define concepto-UU (nuevo-conceptoUU (car ejemplos) 1))
+;(define concepto-UU (nuevo-conceptoUU (car ejemplos) 1))
 (define (PRM concepto-UU ejemplos)
   (let* ((n 0.2)
          (ISET (list-tail ejemplos 1)))
@@ -1244,7 +1254,12 @@
                        (nuevoH (list-ref actualizarAayH 1))
                        (nuevoAa (list-ref actualizarAayH 0)))
                   (recorrerCOUNT nuevoH ISET (- COUNT 1) nuevoAa)))))))
-  (append (list ATTS) (list (recorrerCOUNT H ISET COUNT Aa)))))
+  (define vectorPesos (recorrerCOUNT H ISET COUNT Aa))
+  (if (eq? (length (recorrerCOUNT H ISET COUNT Aa)) 1)
+      (append (list ATTS) (recorrerCOUNT H ISET COUNT Aa))
+      (append (list ATTS) (list (recorrerCOUNT H ISET COUNT Aa))))
+  ;(append (list ATTS) (recorrerCOUNT H ISET COUNT Aa))
+  ))
 
 
 ; Ejercicio 34
@@ -1489,9 +1504,15 @@
 
 ; Ejercicio 3
 
-(define (NSC0 algoritmo PSET NSET DNF)
-(let* ((metadatos (car ejemplos))
-       (nuevosEjemplos (append (list metadatos) PSET NSET)))
+(define (NSC01 algoritmo PSET NSET DNF ejemplos)
+  (let* ((nuevoPSET (map
+                     (lambda (P) (append (drop-right P 1) (list '+)))
+                     PSET))
+         (nuevoNSET (map
+                     (lambda (N) (append (drop-right N 1) (list '-)))
+                     NSET))
+         (metadatos (append (drop-right (car ejemplos) 1) (list '(clase (+ -)))))
+       (nuevosEjemplos (append (list metadatos) nuevoPSET nuevoNSET)))
   (if (empty? PSET)
       DNF
       (let* ((D (algoritmo nuevosEjemplos))
@@ -1502,8 +1523,26 @@
                                    PSET)))
         (if (empty? instanciasCubiertas)
             DNF
-            (NSC0 algoritmo (remq* instanciasCubiertas PSET) NSET nuevoDNF)))
+            (NSC01 algoritmo (remq* instanciasCubiertas PSET) NSET nuevoDNF ejemplos)))
   )))
+
+; No usar esto
+;(define (NSC0 algoritmo PSET NSET DNF)
+;(let* ((ejemplos (leer-ejemplos direccionEjemplos1))
+;       (metadatos (car ejemplos))
+;       (nuevosEjemplos (append (list metadatos) PSET NSET)))
+;  (if (empty? PSET)
+;      DNF
+;      (let* ((D (algoritmo nuevosEjemplos))
+;             (nuevoDNF (append DNF (list D)))
+;             (instanciasCubiertas (filter
+;                                   (lambda (P)
+;                                     ((eval (funcion-match algoritmo)) D (drop-right P 1)))
+;                                   PSET)))
+;        (if (empty? instanciasCubiertas)
+;            DNF
+;            (NSC0 algoritmo (remq* instanciasCubiertas PSET) NSET nuevoDNF)))
+;  )))
 
 (define (NSC algoritmo ejemplos)
  (let*((clasesSeparadas (separarClases ejemplos))
@@ -1540,14 +1579,15 @@
 (define (MSC0 algoritmo ejemplos)
 (let* ((casos (list-tail ejemplos 1))
        (CSET (atributo 'clase ejemplos))
+       (match (funcion-match algoritmo))
        (RULES-PER-CLASS (map
                (lambda (CLASS)
                  (define PSET (casosDeClase ejemplos CLASS))
                  (define NSET (remq* PSET casos))
-                 (define DNF (NSC0 algoritmo PSET NSET '()))
+                 (define DNF (NSC01 algoritmo PSET NSET '() ejemplos))
                  (map
                   (lambda (D)
-                    (list D '=> CLASS))
+                    (list match D '=> CLASS))
                   DNF))
                CSET)))
   (append* RULES-PER-CLASS)
@@ -1557,3 +1597,29 @@
 (append
  (MSC0 algoritmo ejemplos)
  (list `(match-CL ,(make-list (- (length (car ejemplos)) 1) '(*)) => ,(A0 ejemplos)))))
+
+
+; Ejercicio 6
+(define (MSC-HGS ejemplos)
+(let* ()
+(append
+ (MSC0 HGS ejemplos)
+ (list `(match-CL ,(make-list (- (length (car ejemplos)) 1) '(*)) => ,(A0 ejemplos))))))
+
+(define (MSC-LMS ejemplos)
+(let* ()
+(append
+ (MSC0 LMS ejemplos)
+ (list `(match-CL ,(make-list (- (length (car ejemplos)) 1) '(*)) => ,(A0 ejemplos))))))
+
+(define (MSC-PCP ejemplos)
+ (let* ()
+(append
+ (MSC0 PCP ejemplos)
+ (list `(match-CL ,(make-list (- (length (car ejemplos)) 1) '(*)) => ,(A0 ejemplos))))))
+
+
+(define direccionLymphography "/Users/patriciamayotejedor/Documents/Private Development/UNED/Machine Learning/MachineLearning/Assignment3/lymphography.scm")
+(define lymphography (leer-ejemplos direccionLymphography))
+(define direccionPoker  "/Users/patriciamayotejedor/Documents/Private Development/UNED/Machine Learning/MachineLearning/Assignment3/poker.scm")
+(define poker (leer-ejemplos direccionPoker))
