@@ -1648,3 +1648,35 @@
     (((lluvioso)((10) +inf.0)) -> (=> +))
     )
  )
+
+; Ejercicio 9
+; (adg '(soleado 30 40 si) `(((match-LUU (, AtributosProfesor (0 1 1 0 -30))) -> (=> +))((match-LUU (, AtributosProfesor (0 1 -1 0 -20))) -> (=> -)))))
+(define (adg ejemplo-sin-clase ramas-JC)
+(let* ((rama (find
+              (lambda (rama)
+                (define concepto (first rama))
+                (define matchProcedure (first concepto))
+                (define conceptoCL (list-ref concepto 1))
+                ((eval matchProcedure) conceptoCL ejemplo-sin-clase))
+              ramas-JC)))
+  (if (eq? rama #f)
+      '()
+      (list-ref rama 2))
+  ))
+
+; Ejercicio 10
+; (JCi JC '(lluvioso 50))
+(define (JCi concepto-JC ejemplo-sin-clase)
+(let* ()
+  (define recorrerJC
+    (lambda (concepto)
+      (cond
+        [(eq? concepto empty) #f]
+        [(eq? (first concepto) '=>) (list-ref concepto 1)]
+        [else  (recorrerJC ((eval (first concepto)) '(lluvioso 50) (cdr concepto)))]
+       )
+    ))
+  (define clase (recorrerJC concepto-JC))
+  (if (eq? clase #f)
+      ejemplo-sin-clase
+      (append ejemplo-sin-clase (list clase)))))
