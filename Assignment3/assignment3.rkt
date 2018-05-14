@@ -1623,3 +1623,28 @@
 (define lymphography (leer-ejemplos direccionLymphography))
 (define direccionPoker  "/Users/patriciamayotejedor/Documents/Private Development/UNED/Machine Learning/MachineLearning/Assignment3/poker.scm")
 (define poker (leer-ejemplos direccionPoker))
+
+
+; Ejercicio 7
+; > (adc '(soleado 20) '((((*) (-inf.0 30)) -> (=> +)) (((*)((30) +inf.0)) -> (=> -))))   > '(=> +)
+; > (adc '(soleado 15) '((((*) (20 30)) -> (=> +)) (((*) ((30) +inf.0)) -> (=> -))))      > '()
+(define (adc ejemplo-sin-clase ramas-JC-adc)
+(let* ((rama (find
+              (lambda (rama)
+                (match-CL (first rama) ejemplo-sin-clase))
+              ramas-JC-adc)))
+  (if (eq? rama #f)
+      '()
+      (list-ref rama 2))
+  ))
+
+; Ejercicio 8
+(define multivariadoJC
+  '(
+    (((soleado)(-inf.0 30)) -> (=> +))
+    (((soleado)((30) +inf.0)) -> (=> -))
+    (((nublado)(*)) -> (=> -))
+    (((lluvioso)(-inf.0 10)) -> (=> -))
+    (((lluvioso)((10) +inf.0)) -> (=> +))
+    )
+ )
