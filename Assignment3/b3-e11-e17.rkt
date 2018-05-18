@@ -67,18 +67,44 @@
   (recorrerMetadatos 0 '())))
 
 ;;Ejercicio 13
-(he-tardado <minutos> 'b3-e13)
-;;<comentarios>
+(he-tardado 120 'b3-e13)
+; Bastantes problemas ya que la funcion A0 requiere ejemplos con metadatos, y necesita el atributo clase para devlver la mas frecuente
+; Tampoco he entendido que pide la segunda parte del ejercicio
+; (capacidad-de-discriminacion1 '(perspectiva 0 (soleado lluvioso)) '((soleado 10 -)(soleado 25 +)(lluvioso 30 -)))      > 2/3
 (define (capacidad-de-discriminacion1 discriminante ejemplos-disponibles)
+  (let* ((valoresClase (remove-duplicates (map (lambda(ejemplo) (last ejemplo)) ejemplos-disponibles)))
+         (ejemplosConMetadatos (append (list (list (list 'clase valoresClase))) ejemplos-disponibles))
+         (esencia (A0 ejemplosConMetadatos))
+         (ejemplosDivididos (dividir-ejemplos discriminante ejemplos-disponibles))
+         (Cv (map
+              (lambda(ejemplo)
+                (length (filter
+                         (lambda (caso)
+                           (eq? (last caso) esencia)) (cdr ejemplo)))) ejemplosDivididos))
+         (sumatorioCv (apply + Cv)))
+    (/ sumatorioCv (length ejemplos-disponibles))))
+
+
 
 (define capacidad-de-discriminacion capacidad-de-discriminacion1)
-<codigo>)
 
 ;;Ejercicio 14
-(he-tardado <minutos> 'b3-e14)
-;;<comentarios>
+(he-tardado 60 'b3-e14)
+;; Por algun motivo no me dejaba usar las funciones remove, o remq. Resulta que eq? no es lo mismo que equal?
+; (define lista-discriminantes '((perspectiva 0 (soleado lluvioso)) (temperatura 1 numerico 10) (temperatura 1 numerico 25) (temperatura 1 numerico 30)))
+; (define ejemplos-disponibles '((soleado 10 -)(soleado 25 +)(lluvioso 30 -)))
+;> (mayor-discriminante lista-discriminantes ejemplos-disponibles)
+;'((perspectiva 0 (soleado lluvioso)) (temperatura 1 numerico 10) (temperatura 1 numerico 25) (temperatura 1 numerico 30))
 (define (mayor-discriminante lista-discriminantes ejemplos-disponibles)
-<codigo>)
+(let* ((valoresDeDiscriminantes (map
+                                   (lambda(discriminante)
+                                     (capacidad-de-discriminacion1 discriminante ejemplos-disponibles))
+                                   lista-discriminantes))
+       (valorMayor (apply max valoresDeDiscriminantes))
+       (discriminanteMayor (list-ref lista-discriminantes (index-of valoresDeDiscriminantes valorMayor)))
+       (restoDiscriminantes (filter (lambda(discriminante) (not (equal? discriminante discriminanteMayor))) lista-discriminantes)))
+
+  (append (list discriminanteMayor) restoDiscriminantes)))
 
 ;;Ejercicio 15
 (he-tardado <minutos> 'b3-e15)
