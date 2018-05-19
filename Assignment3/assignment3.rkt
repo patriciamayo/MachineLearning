@@ -1775,3 +1775,64 @@
        (restoDiscriminantes (filter (lambda(discriminante) (not (equal? discriminante discriminanteMayor))) lista-discriminantes)))
 
   (append (list discriminanteMayor) restoDiscriminantes)))
+
+; Ejercicio 15
+;> (define lista-discriminantes '((perspectiva 0 (soleado lluvioso nublado)) (temperatura 1 numerico 10)( temperatura 1 numerico 25) (temperatura 1 numerico 30)))
+;> (define ejemplos1 '((soleado 10 -)soleado 25 +)(lluvioso 25 -)(nublado 30 +)))
+;> (DDT0 lista-discriminantes ejemplos1)
+;'(adc
+;  (((soleado (*)) ->  (adc (
+;                            (((*) ((25) +inf.0)) -> (=> +))
+;                            (((*) (-inf.0 25)) -> (=> -)))))
+;   ((lluvioso (*)) -> (=> -))
+;   ((nublado (*)) -> (=> +))))
+(define (list-equal? lst)
+ (andmap (lambda (x) 
+        (equal? x (car lst)))
+      lst))
+
+(define (DDT0 lista-discriminantes ejemplos-disponibles)
+ (let* ()
+   (if (empty? ejemplos-disponibles)
+       '()
+       (if (list-equal? (map (lambda(ejemplo) (last ejemplo)) ejemplos-disponibles)) ; si todos los ejemplos tienen la misma clase
+           (list '=> (last (first ejemplos-disponibles)))
+       (let* ((discriminantesOrdenados (mayor-discriminante lista-discriminantes ejemplos-disponibles))
+              (mayorDiscriminante (first discriminantesOrdenados))
+              (restoDiscriminantes (cdr discriminantesOrdenados))
+              (posicion (list-ref mayorDiscriminante 1))
+              (ejemplosDivididosPorAtributo (dividir-ejemplos mayorDiscriminante ejemplos-disponibles)))
+              (define conceptosCLNumerico
+               (lambda ()
+               (map
+                (lambda(ramaAtributo)
+                  (define atributo (first ramaAtributo))
+                  (define casoGenerico  (map (lambda(valor) '(*)) (drop-right (first ejemplos-disponibles) 1)))
+                  (if (eq? (first atributo) '>=)
+                      (list-set casoGenerico posicion (list (cdr atributo) +inf.0))
+                      (list-set casoGenerico posicion (append (list -inf.0) (cdr atributo))))
+                  )ejemplosDivididosPorAtributo)))
+              (define conceptosCLNominal
+                (lambda ()
+               (map
+                (lambda(ramaAtributo)
+                  (define atributo (first ramaAtributo))
+                  (define casoGenerico  (map (lambda(valor) '(*)) (drop-right (first ejemplos-disponibles) 1)))
+                  (list-set casoGenerico posicion atributo)
+                  ) ejemplosDivididosPorAtributo)))
+         (define conceptosCL
+           (if (list? (first (first ejemplosDivididosPorAtributo)))
+               (conceptosCLNumerico)
+               (conceptosCLNominal)))
+         (append '(adc) (list (map (lambda (conceptoCL ramaAtributo)
+                                     (append (list conceptoCL) '(->) (list ((eval 'DDT0) restoDiscriminantes (cdr ramaAtributo))))) conceptosCL ejemplosDivididosPorAtributo)))
+  )))))
+
+
+
+(define (DDT ejemplos)
+(let* ((metadatos (first ejemplos))
+       (casos (cdr ejemplos))
+       (discriminantes (generar-discriminantes metadatos casos)))
+  (DDT0 discriminantes casos)
+  ))
