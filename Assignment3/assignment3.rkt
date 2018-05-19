@@ -1836,3 +1836,38 @@
        (discriminantes (generar-discriminantes metadatos casos)))
   (DDT0 discriminantes casos)
   ))
+
+
+
+; Ejercicio 16
+;> (capacidad-de-discriminacion2 '(perspectiva 0 (lluvia variable bueno frio niebla calorSeco)) (cdr ejemplos))
+;0.8332062193464952
+(define (capacidad-de-discriminacion2 discriminante ejemplos-disponibles)
+(let* (
+       (totalEjemplos (length ejemplos-disponibles))
+       (clasesPositivas (length (filter (lambda(ejemplo) (equal? (last ejemplo) '+)) ejemplos-disponibles)))
+       (clasesNegativas (-  totalEjemplos clasesPositivas))
+       (ejemplosDivididosPorAtributo (dividir-ejemplos discriminante ejemplos-disponibles))
+       )
+  (define E
+    (lambda(positivos negativos)
+      (if (or (eq? positivos 0) (eq? negativos 0))
+          0
+          (apply + (map (lambda(clase)
+                          (define proporcion (/ clase (+ positivos negativos)))
+                          (* (- proporcion) (log proporcion 2)) ) (list positivos negativos))))))
+  (define entropiaTotal (E clasesPositivas clasesNegativas))
+  (define entropiaAtributo
+    (apply + (map
+     (lambda(ejemploDeAtributo)
+       (define casos (cdr ejemploDeAtributo))
+       (define totalEjemplosDeAtributo (length casos))
+       (define positivosDeAtributo (length (filter (lambda(ejemplo) (equal? (last ejemplo) '+)) casos)))
+       (define negativosDeAtributo (-  totalEjemplosDeAtributo positivosDeAtributo))
+       (* (/ totalEjemplosDeAtributo totalEjemplos) (E positivosDeAtributo negativosDeAtributo))
+       )
+     ejemplosDivididosPorAtributo)))
+  (- entropiaTotal entropiaAtributo)
+))
+
+

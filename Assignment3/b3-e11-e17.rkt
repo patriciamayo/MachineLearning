@@ -170,10 +170,41 @@
   ))
 
 ;;Ejercicio 16
-(he-tardado <minutos> 'b3-e16)
-;;<comentarios>
+(he-tardado 180 'b3-e16)
+;; Espero que este bien, he tenido algunos problemas, por ejemplo con el log de 0, pero luego leyendo el libro me he dado cuenta
+;; que si todos los casos son de la misma clase la entropia es 0, por lo que lo he pasado directamente
+;; Si hay la misma proporcion de casos en una clase que en la otra entonces la entropia es 1
+;; Aunque me haya costado esta muy bien explicado en el pdf ML, mucho mejor y mucho mas claro que la verbosidad matematica que se usa en EML
+;; Me gustaria que hubiese ejemplos en el ejercicio para poder ver si lo he hecho bien o no
+;> (capacidad-de-discriminacion2 '(perspectiva 0 (lluvia variable bueno frio niebla calorSeco)) (cdr ejemplos))
+;0.8332062193464952
 (define (capacidad-de-discriminacion2 discriminante ejemplos-disponibles)
-<codigo>)
+(let* (
+       (totalEjemplos (length ejemplos-disponibles))
+       (clasesPositivas (length (filter (lambda(ejemplo) (equal? (last ejemplo) '+)) ejemplos-disponibles)))
+       (clasesNegativas (-  totalEjemplos clasesPositivas))
+       (ejemplosDivididosPorAtributo (dividir-ejemplos discriminante ejemplos-disponibles))
+       )
+  (define E
+    (lambda(positivos negativos)
+      (if (or (eq? positivos 0) (eq? negativos 0))
+          0
+          (apply + (map (lambda(clase)
+                          (define proporcion (/ clase (+ positivos negativos)))
+                          (* (- proporcion) (log proporcion 2)) ) (list positivos negativos))))))
+  (define entropiaTotal (E clasesPositivas clasesNegativas))
+  (define entropiaAtributo
+    (apply + (map
+     (lambda(ejemploDeAtributo)
+       (define casos (cdr ejemploDeAtributo))
+       (define totalEjemplosDeAtributo (length casos))
+       (define positivosDeAtributo (length (filter (lambda(ejemplo) (equal? (last ejemplo) '+)) casos)))
+       (define negativosDeAtributo (-  totalEjemplosDeAtributo positivosDeAtributo))
+       (* (/ totalEjemplosDeAtributo totalEjemplos) (E positivosDeAtributo negativosDeAtributo))
+       )
+     ejemplosDivididosPorAtributo)))
+  (- entropiaTotal entropiaAtributo)
+))
 
 ;;Ejercicio 17
 (he-tardado <minutos> 'b3-e17)
