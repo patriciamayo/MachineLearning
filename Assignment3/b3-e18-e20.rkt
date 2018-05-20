@@ -56,7 +56,52 @@
 (DTL (DDT ejemplos)))
 
 ;;Ejercicio 20
-(he-tardado <minutos> 'b3-e20)
-;;<comentarios>
-
-
+(he-tardado 100 'b3-e20)
+;; Interesante que las dos listas de decision tienen la misma cantidad, sin emabrgo el atributo numerico se ha obtenido de manera diferente
+;> (define ejemplos-test '(((perspectiva (soleado lluvioso nublado))(temperatura numerico) (clase (+ -))) (soleado 10 -)(soleado 25 +)(lluvioso 30 -)(nublado 30 +)))
+;; ===================================  (define capacidad-de-discriminacion capacidad-de-discriminacion1) ==========================
+;> (DTL-DDT ejemplos-test)
+;'((match-CL ((soleado) ((10) +inf.0)) => +)
+;  (match-CL ((soleado) ((10) +inf.0)) => -)
+;  (match-CL ((lluvioso) (*)) => -)
+;  (match-CL ((nublado) (*)) => +))
+;; ===================================  (define capacidad-de-discriminacion capacidad-de-discriminacion2) ==========================
+;> (DTL-DDT ejemplos-test)
+;'((match-CL ((soleado) ((25) +inf.0)) => +)
+;  (match-CL ((soleado) (-inf.0 25)) => -)
+;  (match-CL ((lluvioso) (*)) => -)
+;  (match-CL ((nublado) (*)) => +))
+;
+;
+;
+;; Si ejecuto mis propios ejemplos con capacidad-de-discriminacion1 me he dado cuenta que me salen algunas incosistencias. 
+;; por ejemplo el mismo concepto da dos clases: (match-CL ((frio) ((5) +inf.0) (*) (*) (*) (*)) => -) (match-CL ((frio) ((5) +inf.0) (*) (*) (*) (*)) => +)
+; Esto no ocurre en en el caso de capacidad-de-discriminacion2, ya que la ramificaciones se reducen considerablemente, evitando precisimante este tipo de errores
+;; ===================================  (define capacidad-de-discriminacion capacidad-de-discriminacion1) ==========================
+;> (DTL-DDT ejemplos)
+;'((match-CL ((lluvia) (*) (*) (*) (*) (*)) => -)
+;  (match-CL ((variable) (*) (*) (*) (*) (*)) => +)
+;  (match-CL ((bueno) (*) (*) (*) (*) (*)) => +)
+;  (match-CL ((frio) ((5) +inf.0) (*) (*) (*) (*)) => -)
+;  (match-CL ((frio) ((5) +inf.0) (*) (*) (*) (*)) => +)
+;  (match-CL ((frio) (-inf.0 5) (*) (*) (*) (*)) => +)
+;  (match-CL ((niebla) (*) (*) (*) (*) (*)) => -)
+;  (match-CL ((calorSeco) (*) (*) (*) (*) (*)) => +))
+;; ===================================  (define capacidad-de-discriminacion capacidad-de-discriminacion2) ==========================
+;> (DTL-DDT ejemplos)
+;'((match-CL ((lluvia) (*) (*) (*) (*) (*)) => -)
+;  (match-CL ((variable) (*) (*) (*) (*) (*)) => +)
+;  (match-CL ((bueno) (*) (*) (*) (*) (*)) => +)
+;  (match-CL ((frio) ((6) +inf.0) (*) (*) (*) (*)) => -)
+;  (match-CL ((frio) (-inf.0 6) (*) (*) (*) (*)) => +)
+;  (match-CL ((niebla) (*) (*) (*) (*) (*)) => -)
+;  (match-CL ((calorSeco) (*) (*) (*) (*) (*)) => +))
+;
+;
+;
+;; En lo que se refiere a la preciosion, aunque hay aaumentado ligeramente en el caso de lymphography, sigue realmente igual
+;; Todas las precisiones con todos los ejemplos con todos los algoritmos han dado siempre valores al rededor del 50%
+;> (stratified-cross-validation DTL-DDT LDi lymphography 10)
+;0.4742857142857143
+;> (stratified-cross-validation DTL-DDT LDi agaricus-lepiota 10)
+;0.5043133744145323
