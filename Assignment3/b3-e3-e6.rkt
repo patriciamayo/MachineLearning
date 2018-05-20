@@ -130,7 +130,7 @@
 
 ;;Ejercicio 6
 (he-tardado 500 'b3-e6)
-;; He tenido que arreglar muchos algoritmos para que funcionase. Por ejemplo con el algoritmo PCP es necesario saber si la clase es positiva or negativa,
+;; He tenido que arreglar muchos algoritmos para que funcionase. Por ejemplo con el algoritmo PCP es necesario saber si la clase es positiva o negativa,
 ;; por lo que se compara con '+ y '-, lo que ha ocasionado problemas al intentar usar los casos de poker y lymphography (tienen mas de dos clases)
 ;; Errores en el formato de LMS tambien han sido arreglados
 ;; Por lo general los resultados son muy malos, solo con HGS y LMS ionosphere se alcanza el 60%

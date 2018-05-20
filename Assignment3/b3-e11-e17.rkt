@@ -70,6 +70,8 @@
 (he-tardado 120 'b3-e13)
 ; Bastantes problemas ya que la funcion A0 requiere ejemplos con metadatos, y necesita el atributo clase para devlver la mas frecuente
 ; Tampoco he entendido que pide la segunda parte del ejercicio
+; EDIT: al final al llegar al ejercicio 17 ya he entendido para que era la segunda parte y he actualidad el ejercicio 14 para
+; que use el valor capacidad-de-discriminacion como discriminante
 ; (capacidad-de-discriminacion1 '(perspectiva 0 (soleado lluvioso)) '((soleado 10 -)(soleado 25 +)(lluvioso 30 -)))      > 2/3
 (define (capacidad-de-discriminacion1 discriminante ejemplos-disponibles)
   (let* ((valoresClase (remove-duplicates (map (lambda(ejemplo) (last ejemplo)) ejemplos-disponibles)))
@@ -98,7 +100,7 @@
 (define (mayor-discriminante lista-discriminantes ejemplos-disponibles)
 (let* ((valoresDeDiscriminantes (map
                                    (lambda(discriminante)
-                                     (capacidad-de-discriminacion1 discriminante ejemplos-disponibles))
+                                    ((eval capacidad-de-discriminacion) discriminante ejemplos-disponibles))
                                    lista-discriminantes))
        (valorMayor (apply max valoresDeDiscriminantes))
        (discriminanteMayor (list-ref lista-discriminantes (index-of valoresDeDiscriminantes valorMayor)))
@@ -107,17 +109,21 @@
   (append (list discriminanteMayor) restoDiscriminantes)))
 
 ;;Ejercicio 15
-(he-tardado 480 'b3-e15)
+(he-tardado 500 'b3-e15)
 ;; Este ejercicio ha sido muy muy complicado, y aun asi creo que no esta bien, porque depende mucho de cual discriminante numerico se coja antes
 ;; Para un mismo atributo numerico puede haber muchos discriminantes  cuando este toma muchos valores distintos
 ;; Cada uno de ellos va a suponer una rama nueva hasta que llegue a aquel que realmente discrimine
+;; He intentado muchisimo "podar" las ramas pero esque no me sale
 ;> (define lista-discriminantes '((perspectiva 0 (soleado lluvioso nublado)) (temperatura 1 numerico 10)( temperatura 1 numerico 25) (temperatura 1 numerico 30)))
 ;> (define ejemplos1 '((soleado 10 -)soleado 25 +)(lluvioso 25 -)(nublado 30 +)))
 ;> (DDT0 lista-discriminantes ejemplos1)
 ;'(adc
-;  (((soleado (*)) ->  (adc (
-;                            (((*) ((25) +inf.0)) -> (=> +))
-;                            (((*) (-inf.0 25)) -> (=> -)))))
+;  (((soleado (*)) -> (adc (
+;                       (((*) ((10) +inf.0)) ->
+;                                              (adc (
+;                                                   (((*) ((25) +inf.0)) -> (=> +))
+;                                                   (((*) (-inf.0 25)) -> (=> -)))))
+;                       (((*) (-inf.0 10)) -> ()))))
 ;   ((lluvioso (*)) -> (=> -))
 ;   ((nublado (*)) -> (=> +))))
 (define (list-equal? lst)
@@ -207,5 +213,32 @@
 ))
 
 ;;Ejercicio 17
-(he-tardado <minutos> 'b3-e17)
-;;<comentarios>
+(he-tardado 300 'b3-e17)
+;; El arbol es mas complejo en el caso capacidad-de-discriminacion1 ya que la manera de descriminar se basa en A0 (la clase mayoritaria), por lo que ha medida
+;; que avanza el algoritmo quedan menos casos y se vuelve mas ineficaz (mayor-discriminante) no devuelve el correcto
+;; Por ejemplo con los ejemplos '((soleado 10 -)(soleado 25 +)), la capacidad-de-discriminacion1 '(temperatura 1 numerico 10) y '(temperatura 1 numerico 25) es 1/2
+;; cuando '(temperatura 1 numerico 25) es la realmente relevante
+
+;; En el caso de capacidad-de-discriminacion2 con la entropia se asignan valores que realmente miden la relevancia del algoritmo, proporcionando el
+;; discriminante correcto a la primera
+
+;> (define ejemplos-test '(((perspectiva (soleado lluvioso nublado))(temperatura numerico) (clase (+ -))) (soleado 10 -)(soleado 25 +)(lluvioso 30 -)(nublado 30 +)))
+;; ===================================  (define capacidad-de-discriminacion capacidad-de-discriminacion1) ==========================
+;> (DDT ejemplos-test)
+;'(adc
+;  (((soleado (*)) -> (adc (
+;                       (((*) ((10) +inf.0)) ->
+;                                              (adc (
+;                                                   (((*) ((25) +inf.0)) -> (=> +))
+;                                                   (((*) (-inf.0 25)) -> (=> -)))))
+;                       (((*) (-inf.0 10)) -> ()))))
+;   ((lluvioso (*)) -> (=> -))
+;   ((nublado (*)) -> (=> +))))
+;; ===================================  (define capacidad-de-discriminacion capacidad-de-discriminacion2) ==========================
+;> (DDT ejemplos-test)
+;'(adc (
+;      ((soleado (*)) -> (adc (
+;                             (((*) ((25) +inf.0)) -> (=> +))
+;                             (((*) (-inf.0 25)) -> (=> -)))))
+;      ((lluvioso (*)) -> (=> -))
+;      ((nublado (*)) -> (=> +))))

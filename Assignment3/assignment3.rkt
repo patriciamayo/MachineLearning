@@ -1760,86 +1760,8 @@
     (/ sumatorioCv (length ejemplos-disponibles))))
 
 
-; Ejercicio 14
-; (define lista-discriminantes '((perspectiva 0 (soleado lluvioso)) (temperatura 1 numerico 10) (temperatura 1 numerico 25) (temperatura 1 numerico 30)))
-; (define ejemplos-disponibles '((soleado 10 -)(soleado 25 +)(lluvioso 30 -)))
-;> (mayor-discriminante lista-discriminantes ejemplos-disponibles)
-;'((perspectiva 0 (soleado lluvioso)) (temperatura 1 numerico 10) (temperatura 1 numerico 25) (temperatura 1 numerico 30))
-(define (mayor-discriminante lista-discriminantes ejemplos-disponibles)
-(let* ((valoresDeDiscriminantes (map
-                                   (lambda(discriminante)
-                                     (capacidad-de-discriminacion1 discriminante ejemplos-disponibles))
-                                   lista-discriminantes))
-       (valorMayor (apply max valoresDeDiscriminantes))
-       (discriminanteMayor (list-ref lista-discriminantes (index-of valoresDeDiscriminantes valorMayor)))
-       (restoDiscriminantes (filter (lambda(discriminante) (not (equal? discriminante discriminanteMayor))) lista-discriminantes)))
-
-  (append (list discriminanteMayor) restoDiscriminantes)))
-
-; Ejercicio 15
-;> (define lista-discriminantes '((perspectiva 0 (soleado lluvioso nublado)) (temperatura 1 numerico 10)( temperatura 1 numerico 25) (temperatura 1 numerico 30)))
-;> (define ejemplos1 '((soleado 10 -)soleado 25 +)(lluvioso 25 -)(nublado 30 +)))
-;> (DDT0 lista-discriminantes ejemplos1)
-;'(adc
-;  (((soleado (*)) ->  (adc (
-;                            (((*) ((25) +inf.0)) -> (=> +))
-;                            (((*) (-inf.0 25)) -> (=> -)))))
-;   ((lluvioso (*)) -> (=> -))
-;   ((nublado (*)) -> (=> +))))
-(define (list-equal? lst)
- (andmap (lambda (x) 
-        (equal? x (car lst)))
-      lst))
-
-(define (DDT0 lista-discriminantes ejemplos-disponibles)
- (let* ()
-   (if (empty? ejemplos-disponibles)
-       '()
-       (if (list-equal? (map (lambda(ejemplo) (last ejemplo)) ejemplos-disponibles)) ; si todos los ejemplos tienen la misma clase
-           (list '=> (last (first ejemplos-disponibles)))
-       (let* ((discriminantesOrdenados (mayor-discriminante lista-discriminantes ejemplos-disponibles))
-              (mayorDiscriminante (first discriminantesOrdenados))
-              (restoDiscriminantes (cdr discriminantesOrdenados))
-              (posicion (list-ref mayorDiscriminante 1))
-              (ejemplosDivididosPorAtributo (dividir-ejemplos mayorDiscriminante ejemplos-disponibles)))
-              (define conceptosCLNumerico
-               (lambda ()
-               (map
-                (lambda(ramaAtributo)
-                  (define atributo (first ramaAtributo))
-                  (define casoGenerico  (map (lambda(valor) '(*)) (drop-right (first ejemplos-disponibles) 1)))
-                  (if (eq? (first atributo) '>=)
-                      (list-set casoGenerico posicion (list (cdr atributo) +inf.0))
-                      (list-set casoGenerico posicion (append (list -inf.0) (cdr atributo))))
-                  )ejemplosDivididosPorAtributo)))
-              (define conceptosCLNominal
-                (lambda ()
-               (map
-                (lambda(ramaAtributo)
-                  (define atributo (first ramaAtributo))
-                  (define casoGenerico  (map (lambda(valor) '(*)) (drop-right (first ejemplos-disponibles) 1)))
-                  (list-set casoGenerico posicion atributo)
-                  ) ejemplosDivididosPorAtributo)))
-         (define conceptosCL
-           (if (list? (first (first ejemplosDivididosPorAtributo)))
-               (conceptosCLNumerico)
-               (conceptosCLNominal)))
-         (append '(adc) (list (map (lambda (conceptoCL ramaAtributo)
-                                     (append (list conceptoCL) '(->) (list ((eval 'DDT0) restoDiscriminantes (cdr ramaAtributo))))) conceptosCL ejemplosDivididosPorAtributo)))
-  )))))
-
-
-
-(define (DDT ejemplos)
-(let* ((metadatos (first ejemplos))
-       (casos (cdr ejemplos))
-       (discriminantes (generar-discriminantes metadatos casos)))
-  (DDT0 discriminantes casos)
-  ))
-
-
-
 ; Ejercicio 16
+; Lo tengo que poner antes para poder cambiar el valor de capacidad-de-discriminacion
 ;> (capacidad-de-discriminacion2 '(perspectiva 0 (lluvia variable bueno frio niebla calorSeco)) (cdr ejemplos))
 ;0.8332062193464952
 (define (capacidad-de-discriminacion2 discriminante ejemplos-disponibles)
@@ -1870,4 +1792,120 @@
   (- entropiaTotal entropiaAtributo)
 ))
 
+(define capacidad-de-discriminacion capacidad-de-discriminacion2)
 
+; Ejercicio 14
+; (define lista-discriminantes '((perspectiva 0 (soleado lluvioso)) (temperatura 1 numerico 10) (temperatura 1 numerico 25) (temperatura 1 numerico 30)))
+; (define ejemplos-disponibles '((soleado 10 -)(soleado 25 +)(lluvioso 30 -)))
+;> (mayor-discriminante lista-discriminantes ejemplos-disponibles)
+;'((perspectiva 0 (soleado lluvioso)) (temperatura 1 numerico 10) (temperatura 1 numerico 25) (temperatura 1 numerico 30))
+(define (mayor-discriminante lista-discriminantes ejemplos-disponibles)
+(let* ((valoresDeDiscriminantes (map
+                                   (lambda(discriminante)
+                                     ((eval capacidad-de-discriminacion) discriminante ejemplos-disponibles))
+                                   lista-discriminantes))
+       (valorMayor (apply max valoresDeDiscriminantes))
+       (discriminanteMayor (list-ref lista-discriminantes (index-of valoresDeDiscriminantes valorMayor)))
+       (restoDiscriminantes (filter (lambda(discriminante) (not (equal? discriminante discriminanteMayor))) lista-discriminantes)))
+
+  (append (list discriminanteMayor) restoDiscriminantes)))
+
+; Ejercicio 15
+;> (define lista-discriminantes '((perspectiva 0 (soleado lluvioso nublado)) (temperatura 1 numerico 10)( temperatura 1 numerico 25) (temperatura 1 numerico 30)))
+;> (define ejemplos1 '((soleado 10 -)(soleado 25 +)(lluvioso 25 -)(nublado 30 +)))
+;> (DDT0 lista-discriminantes ejemplos1)
+;'(adc
+;  (((soleado (*)) ->  (adc (
+;                            (((*) ((25) +inf.0)) -> (=> +))
+;                            (((*) (-inf.0 25)) -> (=> -)))))
+;   ((lluvioso (*)) -> (=> -))
+;   ((nublado (*)) -> (=> +))))
+(define (list-equal? lst)
+ (andmap (lambda (x) 
+        (equal? x (car lst)))
+      lst))
+
+(define (DDT0 lista-discriminantes ejemplos-disponibles)
+ (let* ()
+   (if (empty? ejemplos-disponibles)
+       '()
+       (if (list-equal? (map (lambda(ejemplo) (last ejemplo)) ejemplos-disponibles)) ; si todos los ejemplos tienen la misma clase
+           (list '=> (last (first ejemplos-disponibles)))
+           (if (empty? lista-discriminantes)
+               ; si no queda discriminantes devolver la clase mayoritaria entre los ejemplos disponibles
+               (let* ((clasesPositivas (length (filter (lambda(ejemplo) (equal? (last ejemplo) '+)) ejemplos-disponibles)))
+                      (clasesNegativas (- (length ejemplos-disponibles) clasesPositivas)))
+                 (if (>= clasesPositivas clasesNegativas)
+                     (list '=> '+)
+                     (list '=> '-)
+                     ))
+               
+       (let* ((discriminantesOrdenados (mayor-discriminante lista-discriminantes ejemplos-disponibles))
+              (mayorDiscriminante (first discriminantesOrdenados))
+              (restoDiscriminantes (cdr discriminantesOrdenados))
+              (posicion (list-ref mayorDiscriminante 1))
+              (ejemplosDivididosPorAtributo (dividir-ejemplos mayorDiscriminante ejemplos-disponibles)))
+              (define conceptosCLNumerico
+               (lambda ()
+               (map
+                (lambda(ramaAtributo)
+                  (define atributo (first ramaAtributo))
+                  (define casoGenerico  (map (lambda(valor) '(*)) (drop-right (first ejemplos-disponibles) 1)))
+                  (if (eq? (first atributo) '>=)
+                      (list-set casoGenerico posicion (list (cdr atributo) +inf.0))
+                      (list-set casoGenerico posicion (append (list -inf.0) (cdr atributo))))
+                  )ejemplosDivididosPorAtributo)))
+              (define conceptosCLNominal
+                (lambda ()
+               (map
+                (lambda(ramaAtributo)
+                  (define atributo (first ramaAtributo))
+                  (define casoGenerico  (map (lambda(valor) '(*)) (drop-right (first ejemplos-disponibles) 1)))
+                  (list-set casoGenerico posicion atributo)
+                  ) ejemplosDivididosPorAtributo)))
+         (define conceptosCL
+           (if (list? (first (first ejemplosDivididosPorAtributo)))
+               (conceptosCLNumerico)
+               (conceptosCLNominal)))
+         (append '(adc) (list (map (lambda (conceptoCL ramaAtributo)
+                                     (append (list conceptoCL) '(->) (list ((eval 'DDT0) restoDiscriminantes (cdr ramaAtributo))))) conceptosCL ejemplosDivididosPorAtributo)))
+  ))))))
+
+
+
+(define (DDT ejemplos)
+(let* ((metadatos (first ejemplos))
+       (casos (cdr ejemplos))
+       (discriminantes (generar-discriminantes (drop-right metadatos 1) casos)))
+  (DDT0 discriminantes casos)
+  ))
+
+
+
+; Ejercicio 16
+;> (capacidad-de-discriminacion2 '(perspectiva 0 (lluvia variable bueno frio niebla calorSeco)) (cdr ejemplos))
+;0.8332062193464952
+; --> Se ha movido para estar entre los ejercicios 13 y 14
+
+
+; Ejercicio 17
+;> (define ejemplos-test '(((perspectiva (soleado lluvioso nublado))(temperatura numerico) (clase (+ -))) (soleado 10 -)(soleado 25 +)(lluvioso 30 -)(nublado 30 +)))
+;; ===================================  (define capacidad-de-discriminacion capacidad-de-discriminacion1) ==========================
+;> (DDT ejemplos-test)
+;'(adc
+;  (((soleado (*)) -> (adc (
+;                       (((*) ((10) +inf.0)) ->
+;                                              (adc (
+;                                                   (((*) ((25) +inf.0)) -> (=> +))
+;                                                   (((*) (-inf.0 25)) -> (=> -)))))
+;                       (((*) (-inf.0 10)) -> ()))))
+;   ((lluvioso (*)) -> (=> -))
+;   ((nublado (*)) -> (=> +))))
+;; ===================================  (define capacidad-de-discriminacion capacidad-de-discriminacion2) ==========================
+;> (DDT ejemplos-test)
+;'(adc (
+;      ((soleado (*)) -> (adc (
+;                             (((*) ((25) +inf.0)) -> (=> +))
+;                             (((*) (-inf.0 25)) -> (=> -)))))
+;      ((lluvioso (*)) -> (=> -))
+;      ((nublado (*)) -> (=> +))))
