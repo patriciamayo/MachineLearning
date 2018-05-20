@@ -577,13 +577,16 @@
       )
   (define pasaTestNominal
    (lambda (t1 t2)
+     (if (and (pair? t1) (pair? t2) (symbol? (car t1)) (symbol? (car t2)))
           (cond
             ; Primero nos aseguramos que podemos usar car
-            [(and (pair? t1) (pair? t2) (symbol? (car t1)) (symbol? (car t2))) #t]
+            ;[(and (pair? t1) (pair? t2) (symbol? (car t1)) (symbol? (car t2))) #t]
             ; Si pasa el test nominal significa que es igual o mas general
             [(testNominal t1 t2) #t] 
             [(eq? t2 empty) #t]
-            [else #f])))
+            [else #f])
+          #f
+          )))
        (define pasaTestNumerico
          (lambda (t1 t2)
            (cond
@@ -1665,6 +1668,7 @@
   ))
 
 ; Ejercicio 10
+; (define JC '(adc (((soleado)(*)) -> (adc (((*)(-inf.0 30)) -> (=> +)) (((*)((30) +inf.0)) -> (=> -)) )) (((nublado)(*)) -> (=> -)) (((lluvioso)(*)) -> (adc (((*)(-inf.0 10)) -> (=> -)) (((*)((10) +inf.0)) -> (=> +)) )) ))
 ; (JCi JC '(lluvioso 50))
 (define (JCi concepto-JC ejemplo-sin-clase)
 (let* ()
@@ -1673,7 +1677,7 @@
       (cond
         [(eq? concepto empty) #f]
         [(eq? (first concepto) '=>) (list-ref concepto 1)]
-        [else  (recorrerJC ((eval (first concepto)) '(lluvioso 50) (cdr concepto)))]
+        [else  (recorrerJC ((eval (first concepto)) ejemplo-sin-clase (cdr concepto)))]
        )
     ))
   (define clase (recorrerJC concepto-JC))
@@ -1861,14 +1865,14 @@
                 (lambda(ramaAtributo)
                   (define atributo (first ramaAtributo))
                   (define casoGenerico  (map (lambda(valor) '(*)) (drop-right (first ejemplos-disponibles) 1)))
-                  (list-set casoGenerico posicion atributo)
+                  (list-set casoGenerico posicion (list atributo))
                   ) ejemplosDivididosPorAtributo)))
          (define conceptosCL
            (if (list? (first (first ejemplosDivididosPorAtributo)))
                (conceptosCLNumerico)
                (conceptosCLNominal)))
-         (append '(adc) (list (map (lambda (conceptoCL ramaAtributo)
-                                     (append (list conceptoCL) '(->) (list ((eval 'DDT0) restoDiscriminantes (cdr ramaAtributo))))) conceptosCL ejemplosDivididosPorAtributo)))
+         (append '(adc) (map (lambda (conceptoCL ramaAtributo)
+                                     (append (list conceptoCL) '(->) (list ((eval 'DDT0) restoDiscriminantes (cdr ramaAtributo))))) conceptosCL ejemplosDivididosPorAtributo))
   ))))))
 
 
@@ -1909,3 +1913,22 @@
 ;                             (((*) (-inf.0 25)) -> (=> -)))))
 ;      ((lluvioso (*)) -> (=> -))
 ;      ((nublado (*)) -> (=> +))))
+;> (stratified-cross-validation DDT JCi lymphography 10)
+;0.42142857142857143
+;> (stratified-cross-validation DDT JCi agaricus-lepiota 10)
+;0.5050465344554923
+
+; Ejercicio 18
+;> (union-CL1 '((soleado)(*)) '((*)(10 30)))
+;'((soleado) (10 30))
+;> (union-CL1 '((*)(*)) '((*)(10 30)))
+;'((*) (10 30))
+(define (union-CL concepto-CL1 concepto-CL2)
+(let* ()
+  (map
+   (lambda(cl1 cl2)
+     (if (test-CL>= cl1 cl2)
+         cl2
+         cl1 )
+     ) concepto-CL1 concepto-CL2)
+))

@@ -242,3 +242,10 @@
 ;                             (((*) (-inf.0 25)) -> (=> -)))))
 ;      ((lluvioso (*)) -> (=> -))
 ;      ((nublado (*)) -> (=> +))))
+
+
+;; Comparando los resultados vemos que siguen igual que cualquier otro de los algoritmos, una accuracy que ronda siempre el 50%
+;> (stratified-cross-validation DDT JCi lymphography 10)
+;0.42142857142857143
+;> (stratified-cross-validation DDT JCi agaricus-lepiota 10)
+;0.5050465344554923
