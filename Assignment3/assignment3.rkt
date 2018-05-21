@@ -1587,7 +1587,15 @@
                (lambda (CLASS)
                  (define PSET (casosDeClase ejemplos CLASS))
                  (define NSET (remq* PSET casos))
-                 (define DNF (NSC01 algoritmo PSET NSET '() ejemplos))
+                 (define nuevoPSET (map
+                                    (lambda (P) (append (drop-right P 1) (list '+)))
+                                    PSET))
+                 (define nuevoNSET (map
+                                    (lambda (N) (append (drop-right N 1) (list '-)))
+                                    NSET))
+                 (define metadatos (append (drop-right (car ejemplos) 1) (list '(clase (+ -)))))
+                 (define nuevosEjemplos (append (list metadatos) nuevoPSET nuevoNSET))
+                 (define DNF (NSC algoritmo nuevosEjemplos))
                  (map
                   (lambda (D)
                     (list match D '=> CLASS))

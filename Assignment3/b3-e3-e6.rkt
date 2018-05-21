@@ -1,5 +1,5 @@
 ;;Plantilla b3-e3-e6.scm
-;;Autor: <Nombre y apellidos>
+;;Autor: Patricia Mayo Tejedor
 
 ;;Ejercicio 3
 (he-tardado 90 'b3-e3)
@@ -27,9 +27,11 @@
               (casosAgrupadosPorClase (+ index 1) tiposDeClases casos (append agrupacion (list claseAgrupada)))))))
     (casosAgrupadosPorClase 0 tiposDeClases casos '())))
 
-
+;; Se fuerza a usar el conjunto de datos ejemplos
+;; Editar para poder usar otro conjunto. Pasar el conjunto es necesario porque se necesitan los metadatos
+;; para ejecutar cualquier algoritmo con el que NSC0 crea la D
 (define (NSC0 algoritmo PSET NSET DNF)
-(let* ((metadatos (car ejemplos))
+(let* ((metadatos (car ejemplos))  ;; cambiar los metadatos con los del conjunto de datos que se quira testear
        (nuevosEjemplos (append (list metadatos) PSET NSET)))
   (if (empty? PSET)
       DNF
@@ -44,11 +46,55 @@
             (NSC0 algoritmo (remq* instanciasCubiertas PSET) NSET nuevoDNF)))
   )))
 
+;; Es muy importante que los datos por parametro sean los correctos
+;; Es decir, que siempre se le tienen que pasar solo dos clases
 (define (NSC algoritmo ejemplos)
  (let*((clasesSeparadas (separarClases ejemplos))
-       (PSET (car (clasesSeparadas ejemplos)))
-       (NSET (list-ref (clasesSeparadas ejemplos) 1)))
-  (NSC0 algoritmo PSET NSET '())))
+       (PSET (car clasesSeparadas))
+       (NSET (list-ref clasesSeparadas 1)))
+   
+   (define (NSC0 algoritmo PSET NSET DNF)
+     (let* ((metadatos (car ejemplos))
+            (nuevosEjemplos (append (list metadatos) PSET NSET)))
+       (if (empty? PSET)
+           DNF
+           (let* ((D (algoritmo nuevosEjemplos))
+                  (nuevoDNF (append DNF (list D)))
+                  (instanciasCubiertas (filter
+                                        (lambda (P)
+                                          ((eval (funcion-match algoritmo)) D (drop-right P 1)))
+                                        PSET)))
+             (if (empty? instanciasCubiertas)
+                 DNF
+                 (NSC0 algoritmo (remq* instanciasCubiertas PSET) NSET nuevoDNF)))
+           )))
+   
+   (NSC0 algoritmo PSET NSET '())))
+
+
+;; Este algoritmo permite el pasar como parametro el conjunto de datos que se desea
+;; Quizas resulte mas conveniente, tambien depura los PSET y NSET
+(define (NSC01 algoritmo PSET NSET DNF ejemplos)
+  (let* ((nuevoPSET (map
+                     (lambda (P) (append (drop-right P 1) (list '+)))
+                     PSET))
+         (nuevoNSET (map
+                     (lambda (N) (append (drop-right N 1) (list '-)))
+                     NSET))
+         (metadatos (append (drop-right (car ejemplos) 1) (list '(clase (+ -)))))
+       (nuevosEjemplos (append (list metadatos) nuevoPSET nuevoNSET)))
+  (if (empty? PSET)
+      DNF
+      (let* ((D (algoritmo nuevosEjemplos))
+             (nuevoDNF (append DNF (list D)))
+             (instanciasCubiertas (filter
+                                   (lambda (P)
+                                     ((eval (funcion-match algoritmo)) D (drop-right P 1)))
+                                   PSET)))
+        (if (empty? instanciasCubiertas)
+            DNF
+            (NSC01 algoritmo (remq* instanciasCubiertas PSET) NSET nuevoDNF ejemplos)))
+  )))
 
 ;;Ejercicio 4
 (he-tardado 90 'b3-e4)
@@ -97,7 +143,7 @@
 
 ;;Ejercicio 5
 (he-tardado 90 'b3-e5)
-;; Creo que hay problemas ocn las funciones match, ya que estan definidas de tal manera que si es '+ devuelve true, y sino devuelve false
+;; Creo que hay problemas con las funciones match, ya que estan definidas de tal manera que si es '+ devuelve true, y sino devuelve false
 ;; En todos los ejemplos hemos jugado siempre con dos clases asique no se muy bien que esperar
 ;; Entiendo como el MSC aplica el divide y venceras para soportar varias clases pero me da miedo que yo haya hardcoded las clases + y - en alguna parte
 (define casosDeClase
@@ -110,18 +156,33 @@
 (define (MSC0 algoritmo ejemplos)
 (let* ((casos (list-tail ejemplos 1))
        (CSET (atributo 'clase ejemplos))
+       (match (funcion-match algoritmo))
        (RULES-PER-CLASS (map
                (lambda (CLASS)
                  (define PSET (casosDeClase ejemplos CLASS))
                  (define NSET (remq* PSET casos))
-                 (define DNF (NSC0 algoritmo PSET NSET '()))
+                 ;; ======= depurar los datos para poder usar NSC
+                 (define nuevoPSET (map
+                                    (lambda (P) (append (drop-right P 1) (list '+)))
+                                    PSET))
+                 (define nuevoNSET (map
+                                    (lambda (N) (append (drop-right N 1) (list '-)))
+                                    NSET))
+                 (define metadatos (append (drop-right (car ejemplos) 1) (list '(clase (+ -)))))
+                 (define nuevosEjemplos (append (list metadatos) nuevoPSET nuevoNSET))
+                 ;; ======== fin de depurar los datos
+                 ;;
+                 ;; tambien podriamos haber hecho directamente
+                 ;; (define DNF (NSC01 algoritmo PSET NSET '() ejemplos))
+                 (define DNF (NSC algoritmo nuevosEjemplos))
                  (map
                   (lambda (D)
-                    (list D '=> CLASS))
+                    (list match D '=> CLASS))
                   DNF))
                CSET)))
   (append* RULES-PER-CLASS)
   ))
+
 
 (define (MSC algoritmo ejemplos)
 (append
