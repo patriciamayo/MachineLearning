@@ -5,6 +5,8 @@
 (he-tardado 160 'b2-e30)
 ;; Los resultados concuerdan, se ha asignado mayor peso a la temperatura, mientras que el % en humedad pesa mucho de manera negativa
 ;; Jugar con el n devuelve vectores con numeros proporcionales a n, pero todos guardan relacion similar, dando mayor peso a la temperatura y la humedad
+
+;; (define concepto-UU (nuevo-conceptoUU (car ejemplos) 1))
 ;;> (PRM concepto-UU ejemplos)
 ;;'(((perspectiva (lluvia variable bueno frio niebla calorSeco))
 ;;   (temperaturaGrados numerico)
@@ -14,7 +16,6 @@
 ;;   (viento (si no))
 ;;   (clase (+ -)))
 ;;  (1.1314324763924712 14.606823090142385 1.2694679417762282 0.377506570266878 -17.213593650056858 0.7236111290080276 1.0339599634203298))
-(define concepto-UU (nuevo-conceptoUU (car ejemplos) 1))
 (define (PRM concepto-UU ejemplos)
   (let* ((n 0.2)
          (ISET (list-tail ejemplos 1)))
@@ -40,12 +41,7 @@
                             (define V (traducir A i))
                             (+ (* S n V) W))
                      (drop-right vector 1) (drop-right I 1) (drop-right ATTS 1)))
-                  (recorrerISET (+ indice 1) ISET (list ATTS (append vectorAjustado (list (+ (* S n) umbral)))))
-                  )
-                )
-            )
-         )
-      ))
+                  (recorrerISET (+ indice 1) ISET (list ATTS (append vectorAjustado (list (+ (* S n) umbral)))))))))))
      (recorrerISET 0 ISET concepto-UU)))
 
 ;;Ejercicio 31
@@ -53,6 +49,7 @@
 ;; Los resultados cambian bastante dependiendo del H inicializado al azar,
 ;; pero la mayoria de las veces el resultado se acerca mucho al del ejercicio anterior
 ;;
+;; (define COUNT 1000)
 ;;> (PCP ejemplos)
 ;;'(((perspectiva (lluvia variable bueno frio niebla calorSeco))
 ;;   (temperaturaGrados numerico)
@@ -75,7 +72,7 @@
                                    (match-LUU H (drop-right I 1)))
                              ISET)))
             (if NO-ERRORS H
-                (recorrerCOUNT (PRM concepto-UU ejemplos) ISET (- COUNT 1)))))))
+                (recorrerCOUNT (PRM H ejemplos) ISET (- COUNT 1)))))))
   (recorrerCOUNT H ISET contador)))
 
 ;;Ejercicio 32
@@ -146,7 +143,12 @@
                        (nuevoH (list-ref actualizarAayH 1))
                        (nuevoAa (list-ref actualizarAayH 0)))
                   (recorrerCOUNT nuevoH ISET (- COUNT 1) nuevoAa)))))))
-  (recorrerCOUNT H ISET COUNT Aa)))
+  (define vectorPesos (recorrerCOUNT H ISET COUNT Aa))
+  (if (eq? (length (recorrerCOUNT H ISET COUNT Aa)) 1)
+      (append (list ATTS) (recorrerCOUNT H ISET COUNT Aa))
+      (append (list ATTS) (list (recorrerCOUNT H ISET COUNT Aa))))
+  ;(append (list ATTS) (recorrerCOUNT H ISET COUNT Aa))
+  ))
 
 ;;Ejercicio 33
 (he-tardado 60 'b2-e33)
