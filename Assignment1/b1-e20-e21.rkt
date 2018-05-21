@@ -1,5 +1,5 @@
 ;;Plantilla b1-e20-e21.scm
-;;Autor: <Nombre y apellidos>
+;;Autor: Patricia Mayo Tejedor
 
 ;;Ejercicio 20
 (he-tardado <minutos> 'b1-e20)
