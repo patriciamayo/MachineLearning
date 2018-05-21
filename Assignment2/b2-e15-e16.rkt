@@ -6,12 +6,18 @@
 ;; Me ha costado mucho hacer este ejercicio.
 ;; El pseudocodigo de los dos ultimos for-each del libro no se entiende bien
 ;; A la hora de crear las especialiazaciones hay que pasar un ejemplo (he cogido uno al azar positivo pero no queda claro de donde sacarlo)
+;; Las respuestas concuerdan con lo que se entiende como 'buen dia para salir al campo'
+
 ;; > (EGS0 PSET NSET '() (list (concepto-CL-mas-general (car ejemplos))))
 ;;'(((variable) (*) (*) (*) (*) (*))
 ;;  ((bueno) (*) (*) (*) (*) (*))
 ;;  ((calorSeco) (*) (*) (*) (*) (*))
 ;;  ((*) (*) (subiendo) (*) (*) (*)))
 
+;; > (EGS ejemplos)
+;;'((calorSeco) (*) (*) (*) (*) (*))
+
+; Devuelve una lista con tantos elementos como clases hay. Cada elemento contiene todos los casos de esa clase
 (define separarClases
   (lambda (ejemplos)
     (define tiposDeClases (atributo 'clase ejemplos))
@@ -27,10 +33,17 @@
               (casosAgrupadosPorClase (+ index 1) tiposDeClases casos (append agrupacion (list claseAgrupada)))))))
     (casosAgrupadosPorClase 0 tiposDeClases casos '())))
 
+
+
+; He creado la variable ejemplos dentro del algoritmo para poder ejecutarlo solo
+; Pero claro siempre se va a ejecutar con mis ejemplos
+; Para usar EGS0 por si mismo
 (define PSET (car (separarClases ejemplos)))
 (define NSET (list-ref (separarClases ejemplos) 1))
-
 (define (EGS0 PSET NSET CSET HSET)
+  (let* ()
+    ; Para usar EGS0 por si mismo cargar aqui los ejemplos que se quieran usar
+    (define ejemplos (leer-ejemplos direccionEjemplos1))
     (define HParaEliminar
       (filter (lambda (H)(not (andmap (lambda (P)
                                 (match-CL H (drop-right P 1))) PSET))) HSET))
@@ -64,9 +77,8 @@
                 (andmap
                      (lambda (C) (eq? (cmp-concepto-CL S C) -1)) CSETfinal))
             SPECS))
-        (EGS0 PSET NSET CSETfinal NEWSET))))
+        (EGS0 PSET NSET CSETfinal NEWSET)))))
 
-;; EGS con EGS0 dentro
 (define (EGS ejemplos)
   (let* ()
   (define (EGS0 PSET NSET CSET HSET)
@@ -110,6 +122,8 @@
   (define positivoAlAzar (obtener-al-azar PSET))
   (define listaCSET (EGS0 PSET NSET '() (list (concepto-CL-mas-general (car ejemplos)))))
   (if (equal? listaCSET empty) '() (obtener-al-azar listaCSET))))
+
+
 
 ;;Ejercicio 16
 (he-tardado 90 'b2-e16)

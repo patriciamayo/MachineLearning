@@ -675,9 +675,9 @@
 
 
 ; Ejercicio 11
-;(generalizacion-atributo-numerico '((soleado)(30)(20)(si)) 1 '(soleado 25 40 si -))
-;(generalizacion-atributo-numerico '((soleado)(15 20)(20)(si)) 1 '(soleado 25 40 si +))
-;(generalizacion-atributo-numerico '((soleado)(*)(20)(si)) 1 '(soleado 25 40 si +))
+;(generalizaciones-atributo-numerico '((soleado)(30)(20)(si)) 1 '(soleado 25 40 si -))
+;(generalizaciones-atributo-numerico '((soleado)(15 20)(20)(si)) 1 '(soleado 25 40 si +))
+;(generalizaciones-atributo-numerico '((soleado)(*)(20)(si)) 1 '(soleado 25 40 si +))
 
 (define ejemploEsPositivo
     (lambda (ejemplo)
