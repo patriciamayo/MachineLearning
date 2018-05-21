@@ -4,8 +4,12 @@
 ;;Ejercicio 7
 (he-tardado 60 'b3-e7)
 ; El tiempo incluye leer el tema 7
-; > (adc '(soleado 20) '((((*) (-inf.0 30)) -> (=> +)) (((*)((30) +inf.0)) -> (=> -))))   > '(=> +)
-; > (adc '(soleado 15) '((((*) (20 30)) -> (=> +)) (((*) ((30) +inf.0)) -> (=> -))))      > '()
+; > (adc '(soleado 20) '((((*) (-inf.0 30)) -> (=> +)) (((*)((30) +inf.0)) -> (=> -))))
+;'(=> +)
+; > (adc '(soleado 15) '((((*) (20 30)) -> (=> +)) (((*) ((30) +inf.0)) -> (=> -))))
+;'()
+;> (adc '(soleado 20) '((((soleado)(*)) -> (adc (((*)(-inf.0 30)) -> (=> +)) (((*)((30) +inf.0)) -> (=> -)) )) (((nublado)(*)) -> (=> -)) (((lluvioso)(*)) -> (adc (((*)(-inf.0 10)) -> (=> -)) (((*)((10) +inf.0)) -> (=> +)) ))) )
+;'(adc (((*) (-inf.0 30)) -> (=> +)) (((*) ((30) +inf.0)) -> (=> -)))
 (define (adc ejemplo-sin-clase ramas-JC-adc)
 (let* ((rama (find
               (lambda (rama)
@@ -32,7 +36,8 @@
 (he-tardado 60 'b3-e9)
 ; He tardado mas de lo esperado por problemas con ` y ,
 ; (define AtributosProfesor '((perspectiva (soleado nublado lluvioso)) (temperatura numerico) (humedad numerico) (viento (si no)) (clase (+ -))))
-; (adg '(soleado 30 40 si) `(((match-LUU (, AtributosProfesor (0 1 1 0 -30))) -> (=> +))((match-LUU (, AtributosProfesor (0 1 -1 0 -20))) -> (=> -)))))
+;> (adg '(soleado 30 40 si) `(((match-LUU (, AtributosProfesor (0 1 1 0 -30))) -> (=> +))((match-LUU (, AtributosProfesor (0 1 -1 0 -20))) -> (=> -)))))
+;'(=> +)
 (define (adg ejemplo-sin-clase ramas-JC)
 (let* ((rama (find
               (lambda (rama)
@@ -48,7 +53,9 @@
 
 ;;Ejercicio 10
 (he-tardado 60 'b3-e10)
-; (JCi JC '(lluvioso 50))
+;(define JC '(adc (((soleado)(*)) -> (adc (((*)(-inf.0 30)) -> (=> +)) (((*)((30) +inf.0)) -> (=> -)) )) (((nublado)(*)) -> (=> -)) (((lluvioso)(*)) -> (adc (((*)(-inf.0 10)) -> (=> -)) (((*)((10) +inf.0)) -> (=> +)) )) 
+;> (JCi JC '(lluvioso 50))
+;'(lluvioso 50 +)
 (define (JCi concepto-JC ejemplo-sin-clase)
 (let* ()
   (define recorrerJC
@@ -56,7 +63,7 @@
       (cond
         [(eq? concepto empty) #f]
         [(eq? (first concepto) '=>) (list-ref concepto 1)]
-        [else  (recorrerJC ((eval (first concepto)) '(lluvioso 50) (cdr concepto)))]
+        [else  (recorrerJC ((eval (first concepto)) ejemplo-sin-clase (cdr concepto)))]
        )
     ))
   (define clase (recorrerJC concepto-JC))

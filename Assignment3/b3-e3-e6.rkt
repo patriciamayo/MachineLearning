@@ -198,6 +198,10 @@
 ;; Los conceptos generados por HGS no garantizan que se cubran todos los positivos y ninguno de los negativos, por lo que es indicado para datasets
 ;; donde pudiese haber ruido por lo que que el HGS y su busqueda heuristica es ideal para este dataset
 
+;(define direccionLymphography "/Users/patriciamayotejedor/Documents/Private Development/UNED/Machine Learning/MachineLearning/Assignment3/lymphography.scm")
+;(define lymphography (leer-ejemplos direccionLymphography))
+;(define direccionPoker  "/Users/patriciamayotejedor/Documents/Private Development/UNED/Machine Learning/MachineLearning/Assignment3/poker.scm")
+;(define poker (leer-ejemplos direccionPoker))
 
 
 ;========================= SUBALGORITMOS ====================
