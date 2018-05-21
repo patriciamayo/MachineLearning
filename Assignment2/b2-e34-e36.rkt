@@ -7,7 +7,7 @@
 ;; Lo he hecho bastante rapido. Me queda en duda si tengo que cuidar mas los datos de entrada. En el ejercicio del pdf pone
 ;; que los parametros pueden ser sin clase o con clase, y no te dice cual. Sin embargo en la plantilla parece ser que siempre
 ;; se pone sin clase el primero y con clase el segundo, por lo que no tengo que depurarlos?
-(define (IB ejemplos) ejemplos)
+(define (IB ejemplos) (list-tail ejemplos 1))
 (define (distancia ejemplo-sin-clase ejemplo)
   (let* ((ejemplo-y (drop-right ejemplo 1)))
     (define valor
@@ -16,10 +16,10 @@
           [(number? x) (expt (- y x) 2)]
           [(eq? x y) 0]
           [else 1])))
-    (sqrt (apply + (map
+    (inexact->exact(sqrt (apply + (map
                     (lambda (x y)
                       (valor x y))
-                    ejemplo-sin-clase ejemplo-y)))))
+                    ejemplo-sin-clase ejemplo-y))))))
 
 ;;Ejercicio 35
 (he-tardado 30 'b2-e35)
