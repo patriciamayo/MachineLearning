@@ -240,7 +240,7 @@
 0 -1 -1 2 1 #"\0"
 0 -1 1 #"\0"
 1.0 0 -1 -1 -1 93 -1 -1 0 1 0 0 0 0 0.0 0.0 0.0 1.0 1.0 1.0 0 0 175 0 0
-0 -1 -1           0 14597 0 28 3 12 #"#lang racket"
+0 -1 -1           0 14602 0 28 3 12 #"#lang racket"
 0 0 24 29 1 #"\n"
 0 0 24 3 1 #"("
 0 0 15 3 7 #"require"
@@ -4940,21 +4940,20 @@
 0 0 24 29 1 #"\n"
 0 0 17 3 14 #"; Ejercicio 11"
 0 0 24 29 1 #"\n"
-0 0 17 3 84
+0 0 17 3 86
 (
- #";(generalizacion-atributo-numerico '((soleado)(30)(20)(si)) 1 '(sole"
- #"ado 25 40 si -))"
+ #";(generalizaciones-atributo-numerico '((soleado)(30)(20)(si)) 1 '(so"
+ #"leado 25 40 si -))"
 ) 0 0 24 29 1 #"\n"
-0 0 17 3 87
+0 0 17 3 89
 (
- #";(generalizacion-atributo-numerico '((soleado)(15 20)(20)(si)) 1 '(s"
- #"oleado 25 40 si +))"
+ #";(generalizaciones-atributo-numerico '((soleado)(15 20)(20)(si)) 1 '"
+ #"(soleado 25 40 si +))"
 ) 0 0 24 29 1 #"\n"
-0 0 17 3 83
-(
- #";(generalizacion-atributo-numerico '((soleado)(*)(20)(si)) 1 '(solea"
- #"do 25 40 si +))"
-) 0 0 24 29 1 #"\n"
+0 0 17 3 18 #";(generalizaciones"
+0 0 17 3 67
+#"-atributo-numerico '((soleado)(*)(20)(si)) 1 '(soleado 25 40 si +))"
+0 0 24 29 1 #"\n"
 0 0 24 29 1 #"\n"
 0 0 24 3 1 #"("
 0 0 15 3 6 #"define"
@@ -5318,7 +5317,8 @@
 0 0 24 3 1 #"]"
 0 0 24 29 1 #"\n"
 0 0 24 3 7 #"      ["
-0 0 14 3 4 #"else"
+0 0 14 3 3 #"els"
+0 0 14 3 1 #"e"
 0 0 24 3 2 #" ("
 0 0 14 3 8 #"list-set"
 0 0 24 3 1 #" "
@@ -15030,4 +15030,7 @@
 0 0 24 3 1 #" "
 0 0 14 3 8 #"ejemplos"
 0 0 24 3 3 #")))"
+0 0 24 29 1 #"\n"
+0 0 24 29 1 #"\n"
+0 0 24 3 1 #")"
 0           0

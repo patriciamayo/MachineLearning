@@ -369,7 +369,7 @@
 ;; Definir precision y error
 ;(define precisionA1Ejemplos2 (precision (cdr ejemplos2) (cdr extensionA1iEjemplos2)))
 ;(define errorA1Ejemplo2 (error (cdr ejemplos2) (cdr extensionA1iEjemplos2)))
-)
+
 
 ; Ejercicio 22
 ;(define ejemplosJuntos (mezclar ejemplos ejemplos2))
@@ -1961,3 +1961,5 @@
 
 (define (DTL-DDT ejemplos)
 (DTL (DDT ejemplos)))
+
+)

@@ -4,12 +4,19 @@
 ;;Ejercicio 9
 (he-tardado 90 'b2-e9)
 ;; Un poco lioso al principio ya que he estado haciendolo muy complicado hasta que he encontrado list-set
+;> (especializaciones-atributo-nominal '((bueno) (5 40) (subiendo) (estable) (10 60) (si)) 2 (car ejemplos))
+;'(((bueno) (5 40) () (estable) (10 60) (si)))
+;> (especializaciones-atributo-nominal '((bueno) (5 40) (*) (*) (10 60) (si)) 2 (car ejemplos))
+;'(((bueno) (5 40) (bajando) (*) (10 60) (si))
+;  ((bueno) (5 40) (estable) (*) (10 60) (si))
+;  ((bueno) (5 40) (subiendo) (*) (10 60) (si)))
+
 (define tiposDeAtributo
   (lambda (nombre atributos)
     (define atributoEncontrado (assoc nombre atributos))
     (list-ref atributoEncontrado 1)))
 
-(define (especializaciones-atributo-nominal2 concepto-CL indice metadatos)
+(define (especializaciones-atributo-nominal concepto-CL indice metadatos)
   (let*
       ((atributoReferenciado (list-ref concepto-CL indice))
        (tiposDeAtributo (list-ref (list-ref metadatos indice) 1)))
@@ -30,10 +37,16 @@
         (crearListaEspecializaciones concepto-CL indice tiposDeAtributo '())
         (list (list-set concepto-CL indice empty)))))
 
-
 ;;Ejercicio 10
 (he-tardado 10 'b2-e10)
 ;; Ha sido bastante rapido ya que es practicamente eigual que el ejercicio 9
+;> (generalizaciones-atributo-nominal '(() (5 40) (subiendo) (estable) (10 60) (si)) 0 (car ejemplos))
+;'(((lluvia) (5 40) (subiendo) (estable) (10 60) (si))
+;  ((variable) (5 40) (subiendo) (estable) (10 60) (si))
+;  ((bueno) (5 40) (subiendo) (estable) (10 60) (si))
+;  ((frio) (5 40) (subiendo) (estable) (10 60) (si))
+;  ((niebla) (5 40) (subiendo) (estable) (10 60) (si))
+;  ((calorSeco) (5 40) (subiendo) (estable) (10 60) (si)))
 (define (generalizaciones-atributo-nominal concepto-CL indice metadatos)
   (let*
       ((atributoReferenciado (list-ref concepto-CL indice))
@@ -55,11 +68,20 @@
         (crearListaGeneralizaciones concepto-CL indice tiposDeAtributo '())
         (list (list-set concepto-CL indice (list '*))))))
 
+
 ;;Ejercicio 11
 (he-tardado 90 'b2-e11)
 ;; He tenido que modificar el ejercicio 1.
 ;; Se agradecerian mas ejemplos por ejemplo con (*) o con (20)
 ;; Espero haber entendido bien el ejercicio
+
+;> (generalizaciones-atributo-numerico '((soleado)(30)(20)(si)) 1 '(soleado 25 40 si -))
+;'((soleado) (30) (20) (si))
+;> (generalizaciones-atributo-numerico '((soleado)(15 20)(20)(si)) 1 '(soleado 25 40 si +))
+;'((soleado) (15 (25)) (20) (si))
+;> (generalizaciones-atributo-numerico '((soleado)(*)(20)(si)) 1 '(soleado 25 40 si +))
+;'((soleado) (*) (20) (si))
+
 (define ejemploEsPositivo
     (lambda (ejemplo)
       (eq? (last ejemplo) '+)))
@@ -119,6 +141,15 @@
 ;; Me queda la duda de que hacer en este caso
 ;; > (especializaciones-atributo-numerico '((*)(20)(20)(si)) 1 '(soleado 25 40 si -))
 ;; '((*) (20) (20) (si))
+
+
+;> (especializaciones-atributo-numerico '((*)(*)(20)(si)) 1 '(soleado 25 40 si -))
+;'(((*) (-inf.0 25) (20) (si)) ((*) (25 +inf.0) (20) (si)))
+;> (especializaciones-atributo-numerico '((*)(*)(20)(si)) 1 '(soleado 25 40 si +))
+;'(((*) (*) (20) (si)))
+;> (especializaciones-atributo-numerico '((*)(10 15)(20)(si)) 1 '(soleado 25 40 si -))
+;'(((*) (10 15) (20) (si)))
+
 (define (especializaciones-atributo-numerico concepto-CL indice ejemplo)
     (let*
       ((limiteEnConcepto (list-ref concepto-CL indice))
@@ -140,6 +171,20 @@
 (he-tardado 40 'b2-e13)
 ;; Poned ejemplos de lo que se espera por favor
 ;; Se pasa mas tiempo entendiendo que se espera del ejercicio que haciendolo
+
+;> (generalizaciones-CL '(() (5 20) (subiendo) (estable) (10 60) (si)) (car ejemplos) '(bueno 26 estable subiendo 43 si +))
+;'(((lluvia) (5 20) (subiendo) (estable) (10 60) (si))
+;  ((variable) (5 20) (subiendo) (estable) (10 60) (si))
+;  ((bueno) (5 20) (subiendo) (estable) (10 60) (si))
+;  ((frio) (5 20) (subiendo) (estable) (10 60) (si))
+;  ((niebla) (5 20) (subiendo) (estable) (10 60) (si))
+;  ((calorSeco) (5 20) (subiendo) (estable) (10 60) (si))
+;  (() (5 (26)) (subiendo) (estable) (10 60) (si))
+;  (() (5 20) (*) (estable) (10 60) (si))
+;  (() (5 20) (subiendo) (*) (10 60) (si))
+;  (() (5 20) (subiendo) (estable) (10 60) (si))
+;  (() (5 20) (subiendo) (estable) (10 60) (*)))
+
 (define (generalizaciones-CL concepto-CL metadatos ejemplo)
    (define crearGeneralizaciones
      (lambda (concepto-CL metadatos ejemplo indice listaGeneralizaciones)
@@ -171,7 +216,19 @@
 
 ;;Ejercicio 14
 (he-tardado 20 'b2-e14)
-;; Parecido al ejercicio 13 
+;; Parecido al ejercicio 13
+
+;(especializaciones-CL '((bueno) (5 40) (subiendo) (estable) (10 60) (si)) (car ejemplos) '(bueno 26 estable subiendo 43 si -))
+;'((() (5 40) (subiendo) (estable) (10 60) (si))
+;  ((bueno) (5 26) (subiendo) (estable) (10 60) (si))
+;  ((bueno) (26 40) (subiendo) (estable) (10 60) (si))
+;  ((bueno) (5 40) () (estable) (10 60) (si))
+;  ((bueno) (5 40) (subiendo) () (10 60) (si))
+;  ((bueno) (5 40) (subiendo) (estable) (10 43) (si))
+;  ((bueno) (5 40) (subiendo) (estable) (43 60) (si))
+;  ((bueno) (5 40) (subiendo) (estable) (10 60) ()))
+
+
 (define (especializaciones-CL concepto-CL metadatos ejemplo)
  (define crearEspecializaciones
      (lambda (concepto-CL metadatos ejemplo indice listaEspecializaciones)
