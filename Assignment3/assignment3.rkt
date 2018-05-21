@@ -829,8 +829,8 @@
               (casosAgrupadosPorClase (+ index 1) tiposDeClases casos (append agrupacion (list claseAgrupada)))))))
     (casosAgrupadosPorClase 0 tiposDeClases casos '())))
 
-;(define PSET (car (separarClases ejemplos)))
-;(define NSET (list-ref (separarClases ejemplos) 1))
+(define PSET (car (separarClases ejemplos)))
+(define NSET (list-ref (separarClases ejemplos) 1))
 
 (define (EGS01 PSET NSET CSET HSET)
   (let* ()
@@ -939,7 +939,7 @@
 ; > (HGS0 PSET NSET '() '(((*) (*) (*) (*) (*) (*))))
 ; '(((*) (*) (subiendo) (*) (*) (*)))
 (define (HGS0 PSET NSET CSET HSET)
-    (let* ((Beam-Size +)
+    (let* ((Beam-Size 4)
            (positivoAlAzar (obtener-al-azar PSET)))
       (define ejemplos (leer-ejemplos direccionEjemplos1))
       (define getOPENyCLOSE
