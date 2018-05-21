@@ -4,9 +4,9 @@
 ;;Ejercicio 18
 (he-tardado 45 'b3-e18)
 ;; Resulta que tenia mal la funcion test-CL>= por lo que he tenido que volver atras y arreglarla, espero no haber roto algo al cambiarla ahora
-;> (union-CL1 '((soleado)(*)) '((*)(10 30)))
+;> (union-CL '((soleado)(*)) '((*)(10 30)))
 ;'((soleado) (10 30))
-;> (union-CL1 '((*)(*)) '((*)(10 30)))
+;> (union-CL '((*)(*)) '((*)(10 30)))
 ;'((*) (10 30))
 (define (union-CL concepto-CL1 concepto-CL2)
 (let* ()
@@ -99,9 +99,19 @@
 ;
 ;
 ;
-;; En lo que se refiere a la preciosion, aunque hay aaumentado ligeramente en el caso de lymphography, sigue realmente igual
+;; En lo que se refiere a la preciosion, aunque haya aumentado ligeramente en el caso de lymphography, sigue realmente igual
 ;; Todas las precisiones con todos los ejemplos con todos los algoritmos han dado siempre valores al rededor del 50%
+
+;; ===================================  (define capacidad-de-discriminacion capacidad-de-discriminacion2) ==========================
+
 ;> (stratified-cross-validation DTL-DDT LDi lymphography 10)
 ;0.4742857142857143
 ;> (stratified-cross-validation DTL-DDT LDi agaricus-lepiota 10)
 ;0.5043133744145323
+
+;; ===================================  (define capacidad-de-discriminacion capacidad-de-discriminacion1) ==========================
+
+;> (stratified-cross-validation DDT JCi lymphography 10)
+;0.42142857142857143
+;> (stratified-cross-validation DDT JCi agaricus-lepiota 10)
+;0.5050465344554923
