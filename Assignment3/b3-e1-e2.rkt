@@ -7,6 +7,19 @@
 ;; Ha costado entender el concepto de quasiquote y unquote, sobre buscar lo que significaban, ya que poner ` y , no sirve de mucho en google
 ;; Tambien un poco de lio con => pero despues poniendo ` , se ha resuelto
 ;; Por ultimo la funcion eval ha sido muy util para leer una variable como procedure y no como symbol
+
+
+;> (define concepto-LD '((match-CL ((soleado)(30 40)(50 60)(*)) => +)(match-CL ((*)(*)(*)(*)) => -)))
+;> (define ejemplo-sin-clase '(soleado 30 40 si))
+;  (define AtributosProfesor '((perspectiva (soleado nublado lluvioso)) (temperatura numerico) (humedad numerico) (viento (si no)) (clase (+ -))))
+
+;> (LDi '((match-CL ((soleado)(30 40)(50 60)(*)) => +)(match-CL ((*)(*)(*)(*)) => -))'(soleado 30 40 si))
+;'(soleado 30 40 si -)
+;> (LDi `((match-LUU ,(list AtributosProfesor '(0 1 1 0 -30)) => +) (match-LUU ,(list AtributosProfesor '(0 1 -1 0 -20)) => -)) '(soleado 30 40 si))
+;'(soleado 30 40 si +)
+;> (LDi `((match-LUU ,(list AtributosProfesor '(0 1 1 0 -30)) => +)(match-LUU ,(list AtributosProfesor '(0 1 -1 0 -20)) => -)) '(soleado 10 10 si))
+;'(soleado 10 10 si)
+
 (define (LDi concepto-LD ejemplo-sin-clase)
 (let* ((conceptoQuePasa (find
                          (lambda (concepto)
@@ -18,6 +31,7 @@
       ejemplo-sin-clase
       (append ejemplo-sin-clase (list (last conceptoQuePasa))))))
 
+
 ;;Ejercicio 2
 (he-tardado 40 'b3-e2)
 ;; De nuevo prolemas, que he resuelto con la funcion eval, que me han llevado mas tiempo de lo esperado
@@ -25,7 +39,7 @@
 ;> (eval `(,(funcion-match HGS) '((soleado)(*)) '(soleado si)))
 ;#t
 
-(define *funciones-match* '((HGS . match-CL)(HTC . match-TC)(NB . match-NB)(IB . match-IB)(LMS . match-LUU)(PCP . match-LUU)))
+(define *funciones-match* '((HGS . match-CL)(NB . match-NB)(IB . match-IB)(LMS . match-LUU)(PCP . match-LUU)))
 
 (define (funcion-match algoritmo)
 (let* ((funcionEncontrada (find
