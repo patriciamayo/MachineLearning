@@ -3,7 +3,16 @@
 
 ;;Ejercicio 1
 (he-tardado 240 'b2-e1)
-;;<comentarios>
+;; He creado funciones diferentes para cada tipo de test: Numerico y Nominal
+;; y asi dividir mejor el trabajo de match-CL. En el caso de test numerico se crean dos sub tests
+;; para abarcar ambos limites (superior e inferior). Ademas h etenido que estandarizar los limites,
+;; por ejemplo '(*) realmente significa (-inf.0 +inf.0)
+
+;> (match-CL '((soleado)(*)(10 40)(si)) '(soleado 30 40 si))
+;#f
+;> (match-CL '((soleado)(*)(10 (40))(si)) '(soleado 30 40 si))
+;#t
+
 (define testNominal
     (lambda (atributoTest atributoEjemplo)
       (cond
@@ -16,8 +25,17 @@
 
 (define testNumerico
     (lambda (limites valorEjemplo)
-      (define inferior (car limites))
-      (define superior (list-ref limites 1))
+      (define estandarizarLimites
+        (lambda (limites)
+          (cond
+            [(equal? limites (list '*))'(-inf.0 +inf.0)]
+            [(= (length limites) 0) '(2 1)]
+            [(= (length limites) 1) (list limites limites)]
+            [else limites]
+            )))
+      (define limitesEstandarizados (estandarizarLimites limites))
+      (define inferior (car limitesEstandarizados))
+      (define superior (list-ref limitesEstandarizados 1))
       ; Test limite inferior
       (define limiteInferior
         (lambda (limite valor)
@@ -39,22 +57,27 @@
     (let* ()
       (if (not(= (length concepto-CL) (length ejemplo-sin-clase))) #f
       (andmap
-       (lambda (atributoTest atributoEjemplo atributoTipo)
-         (define tipoDeTest (list-ref atributoTipo 1))
+       (lambda (atributoTest atributoEjemplo)
          (cond
-            [(eq? tipoDeTest 'numerico) (testNumerico atributoTest atributoEjemplo)]
-            [(list? tipoDeTest) (testNominal atributoTest atributoEjemplo)]
-            [else #f]))
+            [(number? atributoEjemplo) (testNumerico atributoTest atributoEjemplo)]
+            [else (testNominal atributoTest atributoEjemplo)]))
        concepto-CL
        ejemplo-sin-clase
-       (drop-right atributos 1)))))
+       ))))
 
 ;;Ejercicio 2
 (he-tardado 60 'b2-e2)
 ;; Al principio no entendia lo que se pedia en el ejercicio
 ;; Despues he tenido que arreglar el Ejercicio 1 porque no manejaba bien '(*)
 ;; Problemas tambien cuando no encuentra ningun ejemplo con test positivo, ya que findf devolvia false en vez de una lista
-(define (CLi concepto-CL ejemplo-sin-clase)
+
+
+; > (CLi '((*) (5 40) (subiendo) (estable) (10 60) (si)) '(bueno 20 subiendo estable 50 si ))
+; '(bueno 20 subiendo estable 50 si +)
+
+
+;; ======= PRIMERA IMPLEMENTACION MAL HECHA =========
+(define (CLiMAL concepto-CL ejemplo-sin-clase)
  (let*
      ( ;; Variables 
       (casos (cdr ejemplos))
@@ -70,16 +93,31 @@
            (obtener-al-azar tiposDeClases)))
    (append ejemplo-sin-clase (list clase))))
 
+;;  ======= EDIT  =======
+;; lo habia hecho mal, ya que al CLi no le pasamos en ningun parametro el total de los ejemplos
+;; la correcta implementacion seria comparandolo con la funcion match. Aunque me surge otro problema
+;; Para el conjunto poker o lymphography, que tienen mas de dos clases, no funciona correctamente
+
+(define (CLi concepto-CL ejemplo-sin-clase)
+(let* ()
+  (if (match-CL concepto-CL ejemplo-sin-clase)
+      (append ejemplo-sin-clase (list '+))
+      (append ejemplo-sin-clase (list '-))
+      )))
+
+
 ;;Ejercicio 3
 (he-tardado 15 'b2-e3)
-;; No se puede dividir por cero como en la practica. Se h aoptado por representar los infinitos con inf.0
+;; No se puede dividir por cero como en la practica. Se ha optado por representar los infinitos con inf.0
 (define CLgeneral '((*) (-inf.0 +inf.0) (*) (*) (-inf.0 +inf.0) (*)))
 (define CLespecifico '(() (1 0) () () (1 0) ()))
 (define CLcercano '((*) (18 +inf.0) (subiendo) (*) (5 60) (no)))
 
 ;;Ejercicio 4
 (he-tardado 7 'b2-e4)
-;;<comentarios>
+;> (define metadatos (car ejemplos))
+;> (concepto-CL-mas-general metadatos)
+;'((*) (*) (*) (*) (*) (*))
 (define (concepto-CL-mas-general metadatos)
     (map
        (lambda (dato)
@@ -90,7 +128,8 @@
 
 ;;Ejercicio 5
 (he-tardado 2 'b2-e5)
-;;<comehtarios>
+;> (concepto-CL-mas-especifico metadatos)
+;'(() () () () () () ())
  (define (concepto-CL-mas-especifico metadatos)
     (map
        (lambda (dato)
