@@ -1804,7 +1804,7 @@
   (- entropiaTotal entropiaAtributo)
 ))
 
-(define capacidad-de-discriminacion capacidad-de-discriminacion2)
+(define capacidad-de-discriminacion capacidad-de-discriminacion1)
 
 ; Ejercicio 14
 ; (define lista-discriminantes '((perspectiva 0 (soleado lluvioso)) (temperatura 1 numerico 10) (temperatura 1 numerico 25) (temperatura 1 numerico 30)))
